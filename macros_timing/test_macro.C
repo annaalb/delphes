@@ -10,11 +10,15 @@ root -l examples/Example1.C'("delphes_output.root")'
 R__LOAD_LIBRARY(libDelphes)
 #include "classes/DelphesClasses.h"
 #include "external/ExRootAnalysis/ExRootTreeReader.h"
+#include "external/ExRootAnalysis/ExRootResult.h"
+#else
+class ExRootTreeReader;
+class ExRootResult;
 #endif
 
 //------------------------------------------------------------------------------
 
-void Example1(const char *inputFile)
+void test_macro(const char *inputFile)
 {
   gSystem->Load("libDelphes");
 
@@ -28,12 +32,12 @@ void Example1(const char *inputFile)
 
   // Get pointers to branches used in this analysis
   TClonesArray *branchJet = treeReader->UseBranch("Jet");
-  TClonesArray *branchElectron = treeReader->UseBranch("Electron");
   TClonesArray *branchEvent = treeReader->UseBranch("Event");
 
+  TCanvas* canvas = new TCanvas("c", "c", 600, 600);
   // Book histograms
-  TH1 *histJetPT = new TH1F("jet_pt", "jet P_{T}", 100, 0.0, 100.0);
-  TH1 *histMass = new TH1F("mass", "M_{inv}(e_{1}, e_{2})", 100, 40.0, 140.0);
+  TH1 *histJetPT = new TH1F("jet_pt", "jet P_{T}", 100, 0.0, 1000.0);
+  TH1 *histJetEta = new TH1F("jet_eta", "jet #eta", 100, 0.0, 5.0);
 
   // Loop over all events
   for(Int_t entry = 0; entry < numberOfEntries; ++entry)
@@ -41,39 +45,23 @@ void Example1(const char *inputFile)
     // Load selected branches with data from specified event
     treeReader->ReadEntry(entry);
 
-
-    //HepMCEvent *event = (HepMCEvent*) branchEvent -> At(0);
-    //LHEFEvent *event = (LHEFEvent*) branchEvent -> At(0);
-    //Float_t weight = event->Weight;
-
     // If event contains at least 1 jet
     if(branchJet->GetEntries() > 0)
     {
-      // Take first jet
-      Jet *jet = (Jet*) branchJet->At(0);
+      for (size_t k = 0; k < branchJet->GetEntries(); k++) {// loop over jets
+        Jet *jet = (Jet*) branchJet->At(k);
+        // Plot jet transverse momentum
+        histJetPT->Fill(jet->PT); //TODO draw in one plot PU and VBF jets
+        histJetEta->Fill(jet->Eta);
 
-      // Plot jet transverse momentum
-      histJetPT->Fill(jet->PT);
-
-      // Print jet transverse momentum
-      cout << "Jet pt: "<<jet->PT << endl;
-    }
-
-    Electron *elec1, *elec2;
-
-    // If event contains at least 2 electrons
-    if(branchElectron->GetEntries() > 1)
-    {
-      // Take first two electrons
-      elec1 = (Electron *) branchElectron->At(0);
-      elec2 = (Electron *) branchElectron->At(1);
-
-      // Plot their invariant mass
-      histMass->Fill(((elec1->P4()) + (elec2->P4())).M());
+      }
     }
   }
 
   // Show resulting histograms
-  histJetPT->Draw();
-  histMass->Draw();
+  histJetEta->Draw();
+
+canvas->SaveAs("Plots/test_VBF_jet_eta.eps");
+
+
 }

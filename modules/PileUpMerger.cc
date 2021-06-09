@@ -97,6 +97,7 @@ void PileUpMerger::Init()
 
   // create output arrays
   fParticleOutputArray = ExportArray(GetString("ParticleOutputArray", "stableParticles"));
+  fPUParticleOutputArray = ExportArray(GetString("PUParticleOutputArray", "stableParticlesPU"));
   fVertexOutputArray = ExportArray(GetString("VertexOutputArray", "vertices"));
 }
 
@@ -252,6 +253,8 @@ void PileUpMerger::Process()
       candidate->Mass = pdgParticle ? pdgParticle->Mass() : -999.9;
 
       candidate->IsPU = 1;
+      
+      fPUParticleOutputArray->Add(candidate);
 
       candidate->Momentum.SetPxPyPzE(px, py, pz, e);
       candidate->Momentum.RotateZ(dphi);
@@ -275,6 +278,7 @@ void PileUpMerger::Process()
       }
 
       fParticleOutputArray->Add(candidate);
+
     }
 
     if(numberOfParticles > 0)

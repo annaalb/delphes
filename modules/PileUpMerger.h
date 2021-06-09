@@ -64,6 +64,7 @@ private:
   const TObjArray *fInputArray; //!
 
   TObjArray *fParticleOutputArray; //!
+  TObjArray *fPUParticleOutputArray; //!
   TObjArray *fVertexOutputArray; //!
 
   ClassDef(PileUpMerger, 1)

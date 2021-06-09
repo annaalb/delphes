@@ -119,9 +119,9 @@ void ExRootResult::CreateCanvas()
 
   gStyle->SetTextFont(kExRootFont);
   gStyle->SetTextSize(kExRootFontSize);
-
-  gStyle->SetOptStat(111110);
-  // gStyle->SetOptFit(101);
+  //gStyle->SetOptStat(0);
+  gStyle->SetOptStat(11);
+  //gStyle->SetOptFit(101);
 
   fCanvas = static_cast<TCanvas *>(gROOT->FindObject("c1"));
   if(fCanvas)
@@ -234,11 +234,11 @@ void ExRootResult::Print(const char *format)
     histogram = 0;
     stack = 0;
 
-    if(object->IsA()->InheritsFrom(TH1::Class()))
+    if(object->IsA()->InheritsFrom(TH1::Class())) // object is a hist
     {
       histogram = static_cast<TH1 *>(object);
     }
-    else if(object->IsA()->InheritsFrom(THStack::Class()))
+    else if(object->IsA()->InheritsFrom(THStack::Class())) // object is a stack
     {
       stack = static_cast<THStack *>(object);
       histogram = static_cast<TH1 *>(stack->GetHists()->First());
@@ -254,15 +254,28 @@ void ExRootResult::Print(const char *format)
       canvas->SetLogy(0);
     }
 
-    if(object->IsA()->InheritsFrom(THStack::Class()))
+    if(object->IsA()->InheritsFrom(THStack::Class())) // draw the stack
     {
       object->Draw("nostack");
       stack->GetXaxis()->SetTitle(histogram->GetXaxis()->GetTitle());
       stack->GetYaxis()->SetTitle(histogram->GetYaxis()->GetTitle());
       stack->GetXaxis()->SetTitleOffset(1.5);
       stack->GetYaxis()->SetTitleOffset(1.75);
+
+      stats = static_cast<TPaveStats *>(histogram->FindObject("stats"));
+      if(stats)
+      {
+        stats->SetX1NDC(0.47);
+        stats->SetX2NDC(0.67);
+        stats->SetY1NDC(0.57);
+        stats->SetY2NDC(0.77);
+        stats->SetTextFont(kExRootFont);
+        stats->SetTextSize(kExRootFontSize);
+        stats->SetFillColor(kExRootBackgroundColor);
+        canvas->Draw();
+      }
     }
-    else
+    else // draw the hist
     {
       object->Draw();
     }
@@ -276,10 +289,11 @@ void ExRootResult::Print(const char *format)
       {
         stats->SetX1NDC(0.67);
         stats->SetX2NDC(0.99);
-        stats->SetY1NDC(0.77);
+        stats->SetY1NDC(0.87);
         stats->SetY2NDC(0.99);
         stats->SetTextFont(kExRootFont);
         stats->SetTextSize(kExRootFontSize);
+        stats->SetFillColor(kExRootBackgroundColor);
         canvas->Draw();
       }
     }
@@ -316,7 +330,7 @@ TH1 *ExRootResult::AddHist1D(const char *name, const char *title,
   fPool.insert(hist);
   fPlotMap[hist] = settings;
 
-  HistStyle(hist, kFALSE);
+  HistStyle(hist, kTRUE);
   if(fFolder) fFolder->Add(hist);
   return hist;
 }
@@ -340,7 +354,7 @@ TH1 *ExRootResult::AddHist1D(const char *name, const char *title,
   fPool.insert(hist);
   fPlotMap[hist] = settings;
 
-  HistStyle(hist, kFALSE);
+  HistStyle(hist, kTRUE);
   if(fFolder) fFolder->Add(hist);
   return hist;
 }
@@ -364,7 +378,7 @@ TProfile *ExRootResult::AddProfile(const char *name, const char *title,
   fPool.insert(profile);
   fPlotMap[profile] = settings;
 
-  HistStyle(profile, kFALSE);
+  HistStyle(profile, kTRUE);
   if(fFolder) fFolder->Add(profile);
   return profile;
 }
@@ -389,7 +403,7 @@ TH2 *ExRootResult::AddHist2D(const char *name, const char *title,
   fPool.insert(hist);
   fPlotMap[hist] = settings;
 
-  HistStyle(hist, kFALSE);
+  HistStyle(hist, kTRUE);
   if(fFolder) fFolder->Add(hist);
   return hist;
 }
@@ -421,7 +435,7 @@ TPaveText *ExRootResult::AddComment(Double_t x1, Double_t y1, Double_t x2, Doubl
   comment->SetTextFont(kExRootFont);
   comment->SetTextAlign(22);
   comment->SetFillColor(kExRootBackgroundColor);
-  comment->SetBorderSize(2);
+  comment->SetBorderSize(0);
 
   fPool.insert(comment);
 
@@ -437,7 +451,7 @@ TLegend *ExRootResult::AddLegend(Double_t x1, Double_t y1, Double_t x2, Double_t
   legend->SetTextSize(kExRootFontSize);
   legend->SetTextFont(kExRootFont);
   legend->SetFillColor(kExRootBackgroundColor);
-  legend->SetBorderSize(2);
+  legend->SetBorderSize(1);
 
   fPool.insert(legend);
 
