@@ -120,7 +120,7 @@ void ExRootResult::CreateCanvas()
   gStyle->SetTextFont(kExRootFont);
   gStyle->SetTextSize(kExRootFontSize);
   //gStyle->SetOptStat(0);
-  gStyle->SetOptStat(11);
+  gStyle->SetOptStat(1111);
   //gStyle->SetOptFit(101);
 
   fCanvas = static_cast<TCanvas *>(gROOT->FindObject("c1"));
@@ -289,7 +289,7 @@ void ExRootResult::Print(const char *format)
       {
         stats->SetX1NDC(0.67);
         stats->SetX2NDC(0.99);
-        stats->SetY1NDC(0.87);
+        stats->SetY1NDC(0.77);
         stats->SetY2NDC(0.99);
         stats->SetTextFont(kExRootFont);
         stats->SetTextSize(kExRootFontSize);

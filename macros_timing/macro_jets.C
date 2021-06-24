@@ -29,12 +29,6 @@ struct MyPlots
   TH1 *fJetAK8PT;
   TH1 *fJetAK8Eta;
 
-  // TH1 *fJetPUPPIPT;
-  // TH1 *fJetPUPPIEta;
-
-  // TH1 *fgenjetPT;
-  // TH1 *fgenjetETA;
-
   TH1 *fgenparticlePT[4];
   TH1 *fgenparticleEta[4];
 
@@ -43,6 +37,8 @@ struct MyPlots
   TH1 *fVBFmatchedjetEta[3];
   TH1 *fVBFmatchedjetCHPT[3];
   TH1 *fVBFmatchedjetCHEta[3];
+  TH1 *fVBFmatchedjetCHT[3];
+  TH1 *fVBFmatchedjetCHZ[3];
 
   TH1 *fbmatchedjetDeltaR[3];
   TH1 *fbmatchedjetPT[3];
@@ -50,6 +46,8 @@ struct MyPlots
 
   TH1 *fnotmatchedjetPT[3];
   TH1 *fnotmatchedjetEta[3];
+  TH1 *fnotmatchedjetCHT[3];
+  TH1 *fnotmatchedjetCHZ[3];
 
 };
 
@@ -69,6 +67,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   THStack *stack_3;
   THStack *stack_4;
   THStack *stack_5;
+  THStack *stack_6;
+  THStack *stack_7;
 
   THStack *stack_b_1;
   THStack *stack_b_2;
@@ -77,6 +77,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   THStack *stack_PU_1;
   THStack *stack_PU_2;
   THStack *stack_PU_3;
+  THStack *stack_PU_4;
 
   // book more histograms
   plots->fJetPT[0] = result->AddHist1D(
@@ -266,6 +267,52 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   // attach legend to stack (legend will be printed over stack in .eps file)
   result->Attach(stack_5, legend);
 
+  plots->fVBFmatchedjetCHT[0] = result->AddHist1D(
+    "VBF_AK4_CH_vtx_T", "VBF CH vtx T",
+    "VBF CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+  plots->fVBFmatchedjetCHT[1] = result->AddHist1D(
+    "VBF_PUPPI_CH_vtx_T", "VBF CH vtx T",
+    "VBF CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+  plots->fVBFmatchedjetCHT[2] = result->AddHist1D(
+    "VBF_genjet_CH_vtx_T", "VBF CH vtx T",
+    "VBF CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+
+  plots->fVBFmatchedjetCHT[0]->SetLineColor(kRed);
+  plots->fVBFmatchedjetCHT[1]->SetLineColor(kBlue);
+  plots->fVBFmatchedjetCHT[2]->SetLineColor(kGreen+3);
+
+  // book 1 stack of 2 histograms
+  stack_6 = result->AddHistStack("VBF_CH_vtx_T", "VBF CH vtx T");
+  stack_6->Add(plots->fVBFmatchedjetCHT[0]);
+  stack_6->Add(plots->fVBFmatchedjetCHT[1]);
+  stack_6->Add(plots->fVBFmatchedjetCHT[2]);
+
+  // attach legend to stack (legend will be printed over stack in .eps file)
+  result->Attach(stack_6, legend);
+
+  plots->fVBFmatchedjetCHZ[0] = result->AddHist1D(
+    "VBF_AK4_CH_vtx_Z", "VBF CH vtx Z",
+    "VBF CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+  plots->fVBFmatchedjetCHZ[1] = result->AddHist1D(
+    "VBF_PUPPI_CH_vtx_Z", "VBF CH vtx Z",
+    "VBF CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+  plots->fVBFmatchedjetCHZ[2] = result->AddHist1D(
+    "VBF_genjet_CH_vtx_Z", "VBF CH vtx Z",
+    "VBF CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+
+  plots->fVBFmatchedjetCHZ[0]->SetLineColor(kRed);
+  plots->fVBFmatchedjetCHZ[1]->SetLineColor(kBlue);
+  plots->fVBFmatchedjetCHZ[2]->SetLineColor(kGreen+3);
+
+  // book 1 stack of 2 histograms
+  stack_7 = result->AddHistStack("VBF_CH_vtx_Z", "VBF CH vtx Z");
+  stack_7->Add(plots->fVBFmatchedjetCHZ[0]);
+  stack_7->Add(plots->fVBFmatchedjetCHZ[1]);
+  stack_7->Add(plots->fVBFmatchedjetCHZ[2]);
+
+  // attach legend to stack (legend will be printed over stack in .eps file)
+  result->Attach(stack_7, legend);
+
   //-----------b -matched----------
   // book 3 histograms for PT of matched jets, PUPPIjets and genjet
   plots->fbmatchedjetPT[0] = result->AddHist1D(
@@ -383,6 +430,52 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
   // attach legend to stack (legend will be printed over stack in .eps file)
   result->Attach(stack_PU_2, legend);
+
+  plots->fnotmatchedjetCHT[0] = result->AddHist1D(
+    "not_matched_AK4_CH_vtx_T", "not_matched CH vtx T",
+    "not_matched CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+  plots->fnotmatchedjetCHT[1] = result->AddHist1D(
+    "not_matched_PUPPI_CH_vtx_T", "not_matched CH vtx T",
+    "not_matched CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+  plots->fnotmatchedjetCHT[2] = result->AddHist1D(
+    "not_matched_genjet_CH_vtx_T", "not_matched CH vtx T",
+    "not_matched CH vtx T - PV T [ns]", "number of particles", 100, -0.5, 0.5);
+
+  plots->fnotmatchedjetCHT[0]->SetLineColor(kRed);
+  plots->fnotmatchedjetCHT[1]->SetLineColor(kBlue);
+  plots->fnotmatchedjetCHT[2]->SetLineColor(kGreen+3);
+
+  // book 1 stack of 2 histograms
+  stack_PU_3 = result->AddHistStack("not_matched_CH_vtx_T", "not_matched CH vtx T");
+  stack_PU_3->Add(plots->fnotmatchedjetCHT[0]);
+  stack_PU_3->Add(plots->fnotmatchedjetCHT[1]);
+  stack_PU_3->Add(plots->fnotmatchedjetCHT[2]);
+
+  // attach legend to stack (legend will be printed over stack in .eps file)
+  result->Attach(stack_PU_3, legend);
+
+  plots->fnotmatchedjetCHZ[0] = result->AddHist1D(
+    "not_matched_AK4_CH_vtx_Z", "not_matched CH vtx Z",
+    "not_matched CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+  plots->fnotmatchedjetCHZ[1] = result->AddHist1D(
+    "not_matched_PUPPI_CH_vtx_Z", "not_matched CH vtx Z",
+    "not_matched CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+  plots->fnotmatchedjetCHZ[2] = result->AddHist1D(
+    "not_matched_genjet_CH_vtx_Z", "not_matched CH vtx Z",
+    "not_matched CH vtx Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+
+  plots->fnotmatchedjetCHZ[0]->SetLineColor(kRed);
+  plots->fnotmatchedjetCHZ[1]->SetLineColor(kBlue);
+  plots->fnotmatchedjetCHZ[2]->SetLineColor(kGreen+3);
+
+  // book 1 stack of 2 histograms
+  stack_PU_4 = result->AddHistStack("not_matched_CH_vtx_Z", "not_matched CH vtx Z");
+  stack_PU_4->Add(plots->fnotmatchedjetCHZ[0]);
+  stack_PU_4->Add(plots->fnotmatchedjetCHZ[1]);
+  stack_PU_4->Add(plots->fnotmatchedjetCHZ[2]);
+
+  // attach legend to stack (legend will be printed over stack in .eps file)
+  result->Attach(stack_PU_4, legend);
   }
 
   //------------------------------------------------------------------------------
@@ -394,6 +487,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchJetAK8 = treeReader->UseBranch("JetAK8");
     TClonesArray *branchParticle = treeReader->UseBranch("Particle");
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
+    TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
     TClonesArray *branchJets[3] = {branchJet, branchJetPUPPI, branchGenJet};
 
@@ -415,6 +509,9 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TObject* object;
     GenParticle* particle;
     GenParticle* constituent;
+    Track* track;
+    Vertex* vtx;
+    Double_t Pvtx_T, Pvtx_Z;
 
     Double_t matching_radius_large = 1;
     Double_t matching_radius = 0.4;
@@ -467,6 +564,17 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
         } // end for genparticle branch
       }// end if genparticle branch not empty
 
+      // PV time and Z
+      for(Int_t i = 0; i < branchVtx->GetEntriesFast(); ++i)
+      {
+        // Take vtx
+        vtx = (Vertex*) branchVtx->At(i);
+        if (vtx->Index == 0) { //TODO is this always the PV?
+          Pvtx_Z = vtx->Z;
+          Pvtx_T = vtx->T;
+          }
+      }
+
     // --------Analyse jets -- 0 AK4 jets, 1 PUPPI,  2 GenJets ---------
     for (Int_t m = 0; m < 3; m++) {
       if(branchJets[m]->GetEntriesFast() > 0)
@@ -510,7 +618,24 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
                 if (constituent->Charge != 0) {
                   plots->fVBFmatchedjetCHPT[m]->Fill(constituent->PT);
                   plots->fVBFmatchedjetCHEta[m]->Fill(constituent->Eta);
+                  plots->fVBFmatchedjetCHT[m]->Fill((constituent->T - Pvtx_T )* 1000000000);
+                  plots->fVBFmatchedjetCHZ[m]->Fill((constituent->Z - Pvtx_Z )/1000);
                 }
+              }
+            }
+
+            // Loop over all jet's constituents
+            for(size_t j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
+            {
+              object = jet->Constituents.At(j);
+              // Check if the constituent is accessible
+              if(object == 0) continue;
+
+              if(object->IsA() == Track::Class())
+              {
+                track = (Track*) object;
+                cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
+                //momentum += track->P4();
               }
             }
           }
@@ -518,7 +643,19 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             // rest of the jets
             plots->fnotmatchedjetPT[m]->Fill(jet->PT);
             plots->fnotmatchedjetEta[m]->Fill(jet->Eta);
-          }
+            for (size_t k = 0; k < jet->Particles.GetEntriesFast(); k++) {
+              object = jet->Particles.At(k);
+              if (object == 0) continue;
+              if (object->IsA() == GenParticle::Class()) {
+                constituent = (GenParticle*) jet->Particles.At(k);
+                if (constituent->Charge != 0) {
+            plots->fnotmatchedjetCHT[m]->Fill((constituent->T - Pvtx_T )* 1000000000);
+            plots->fnotmatchedjetCHZ[m]->Fill((constituent->Z - Pvtx_Z )/1000);
+                }
+              }
+            }
+          }//end else
+
           }
         }
       }
@@ -554,7 +691,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots");
+    gSystem->cd("Plots/TimeSmearing/tracks");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

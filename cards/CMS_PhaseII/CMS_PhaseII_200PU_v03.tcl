@@ -11,7 +11,7 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 10
+#set MaxEvents 10
 
 set ExecutionPath {
 
@@ -32,6 +32,7 @@ set ExecutionPath {
   MuonMomentumSmearing
 
   TrackMerger
+  TimeSmearing
 
   ECal
   HCal
@@ -493,6 +494,17 @@ module Merger TrackMerger {
   set OutputArray tracks
 }
 
+########################################
+#   Time Smearing
+########################################
+
+module TimeSmearing TimeSmearing {
+  set InputArray TrackMerger/tracks
+  set OutputArray tracks
+
+  # assume 30 ps resolution for now
+  set TimeResolution 30E-12
+}
 
 #############
 #   ECAL
@@ -500,7 +512,8 @@ module Merger TrackMerger {
 
 module SimpleCalorimeter ECal {
   set ParticleInputArray ParticlePropagator/stableParticles
-  set TrackInputArray TrackMerger/tracks
+  #set TrackInputArray TrackMerger/tracks
+  set TrackInputArray TimeSmearing/tracks
 
   set TowerOutputArray ecalTowers
   set EFlowTrackOutputArray eflowTracks
@@ -4129,8 +4142,6 @@ module StatusPidFilter GenParticleFilter {
 
 module TreeWriter TreeWriter {
 
-
-
 # add Branch InputArray BranchName BranchClass
   add Branch GenParticleFilter/filteredParticles Particle GenParticle
   #add Branch Delphes/allParticles Particle GenParticle
@@ -4138,10 +4149,11 @@ module TreeWriter TreeWriter {
   #add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
   #add Branch NeutrinoFilterPU/filteredParticlesPU PUParticle GenParticle
   add Branch PileUpMerger/vertices Vertex Vertex
+  #add Branch TrackMerger/tracks Track Track
+  add Branch TimeSmearing/tracks TrackSmearing Track
 
   add Branch GenJetFinder/jets GenJet Jet
   add Branch GenJetFinderPU/jetsPU GenJetPU Jet
-  add Branch GenJetFinderPU/Rho GenJetPURho Rho
   #add Branch GenJetFinderPU/constituentsPU ConstituentsPU GenParticle
   add Branch GenJetFinderAK8/jetsAK8 GenJetAK8 Jet
   add Branch GenMissingET/momentum GenMissingET MissingET
