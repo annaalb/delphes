@@ -34,6 +34,7 @@ struct MyPlots
   TH1 *fPUgenjetCHEta;
   TH1 *fPUgenjetCHT;
   TH1 *fPUgenjetCHZ;
+  TH1 *fPUgenjetCHPosT;
 
   TH1 *fPUgenparticlePT;
   TH1 *fPUgenparticleETA;
@@ -103,6 +104,9 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       "PU_genjet_CH_dZ", "track Z - vtx Z",
       "PU CH Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
 
+      plots->fPUgenjetCHPosT = result->AddHist1D(
+        "PU_genjet_CH_Pos_dT", "CH T - PV T",
+        "PU CH Position.T - PV T [ns]", "number of particles", 100, -1, 1);
     // genparticles
   plots->fPUgenparticlePT = result->AddHist1D(
     "PU_genparticle_pt", "PU genparticle P_{T}",
@@ -159,7 +163,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     TObject* object;
     GenParticle* particle;
-    GenParticle* candidate;
+    Candidate* candidate;
 
     Vertex* vtx;
     Double_t Pvtx_T, Pvtx_Z;
@@ -232,6 +236,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
               }
               if (particle->IsPU == 1) {
                 ++nPUParts;
+              }
+            }
+            if(object->IsA() == Candidate::Class())
+            {  candidate = (Candidate*) object;
+              if (candidate->Charge != 0) {
+                plots->fPUgenjetCHPosT->Fill((candidate->Position.T() - Pvtx_T )* 1000000000);
               }
             }
             // get tracks

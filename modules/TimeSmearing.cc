@@ -102,7 +102,8 @@ void TimeSmearing::Process()
   fItTrackInputArray->Reset();
   while((candidate = static_cast<Candidate *>(fItTrackInputArray->Next())))
   {
-
+    std::cout << "Set time smearing on candidate!" << '\n';
+    const TLorentzVector &candidateInitialPosition = candidate->InitialPosition;
     const TLorentzVector &candidateFinalPosition = candidate->Position;
     const TLorentzVector &candidateMomentum = candidate->Momentum;
 
@@ -120,7 +121,13 @@ void TimeSmearing::Process()
 
     candidate->Position.SetT(tf_smeared * 1.0E3 * c_light);
     candidate->ErrorT = timeResolution * 1.0E3 * c_light;
+    static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf * 1.0E3 * c_light);
+    std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';
 
+    std::cout << "Initial Time " << candidate->InitialPosition.T() << '\n';
+    std::cout << "Position.SetT " << candidate->Position.T() << '\n';
+
+std::cout << "Error T "<< candidate->ErrorT << '\n';
     candidate->AddCandidate(mother);
     fOutputArray->Add(candidate);
   }

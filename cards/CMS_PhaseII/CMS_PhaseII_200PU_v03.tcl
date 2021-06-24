@@ -11,7 +11,7 @@
 # Order of execution of various modules
 #######################################
 
-#set MaxEvents 10
+set MaxEvents 1
 
 set ExecutionPath {
 
@@ -32,6 +32,7 @@ set ExecutionPath {
   MuonMomentumSmearing
 
   TrackMerger
+  TrackSmearing
   TimeSmearing
 
   ECal
@@ -495,11 +496,25 @@ module Merger TrackMerger {
 }
 
 ########################################
+#   Smear tracks
+########################################
+
+module TrackSmearing TrackSmearing {
+  set InputArray TrackMerger/tracks
+  set BeamSpotInputArray BeamSpotFilter/beamSpotParticle
+  set OutputArray tracks
+  set ApplyToPileUp true
+
+  # from http://mersi.web.cern.ch/mersi/layouts/.private/Baseline_tilted_200_Pixel_1_1_1/index.html
+  source trackResolution.tcl
+}
+
+########################################
 #   Time Smearing
 ########################################
 
 module TimeSmearing TimeSmearing {
-  set InputArray TrackMerger/tracks
+  set InputArray TrackSmearing/tracks
   set OutputArray tracks
 
   # assume 30 ps resolution for now
@@ -4149,7 +4164,7 @@ module TreeWriter TreeWriter {
   #add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
   #add Branch NeutrinoFilterPU/filteredParticlesPU PUParticle GenParticle
   add Branch PileUpMerger/vertices Vertex Vertex
-  #add Branch TrackMerger/tracks Track Track
+  add Branch TrackMerger/tracks Track Track
   add Branch TimeSmearing/tracks TrackSmearing Track
 
   add Branch GenJetFinder/jets GenJet Jet

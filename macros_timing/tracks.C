@@ -32,6 +32,9 @@ struct MyPlots
   TH1* ftrackY[2];
   TH1* ftrackZ[2];
   TH1* ftrackT[2];
+  TH1* ftrackPosT[2];
+  TH1* ftrackInitialPosT[2];
+
   TH1* fdeltaT[2];
   TH1* fdeltaZ[2];
   TH1* fTres[2];
@@ -77,6 +80,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   plots->ftrackT[i] = result->AddHist1D(
     "track_T_"+name[i], "track T",
     "track T [ns]", "number of tracks", 100, -1, 1);
+    // plots->ftrackPosT[i] = result->AddHist1D(
+    //   "track_T_"+name[i], "track T",
+    //   "track Position.T [ns]", "number of tracks", 100, -1, 1);
+    //   plots->ftrackInitialPosT[i] = result->AddHist1D(
+    //     "track_Init_Pos_T_"+name[i], "track T",
+    //     "track InitialPosition.T [ns]", "number of tracks", 100, -1, 1);
 
   plots->fdeltaT[i] = result->AddHist1D(
     "track_T_minus_vtx_T_"+name[i], "track T - vtx T",
@@ -113,7 +122,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     cout << "** Chain contains " << allEntries << " events" << endl;
 
     TClonesArray *branchTrack = treeReader->UseBranch("Track");
-    TClonesArray *branchTrackSmeared = treeReader->UseBranch("TrackSmeared");
+    TClonesArray *branchTrackSmeared = treeReader->UseBranch("TrackSmearing");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
     TClonesArray *branchTracks[2] = {branchTrack, branchTrackSmeared};
@@ -153,6 +162,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           plots->ftrackY[i]->Fill(track->Y);
           plots->ftrackZ[i]->Fill(track->Z/1000); // to have it in m
           plots->ftrackT[i]->Fill(track->T * 1000000000); // to have it in ns
+          // plots->ftrackPosT[i]->Fill(track->Position.T() * 1000000000); // to have it in ns
+          // plots->ftrackInitialPosT[i]->Fill(track->InitialPosition.T() * 1000000000); // to have it in ns
 
           plots->ftrackErrorT[i]->Fill(track->ErrorT* 1000000000); // track position error (t component)
 
