@@ -89,9 +89,9 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
   TClonesArray *branchElectron = treeReader->UseBranch("Electron");
   TClonesArray *branchPhoton = treeReader->UseBranch("Photon");
   TClonesArray *branchMuon = treeReader->UseBranch("Muon");
-  TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
-  TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
-  TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
+   //TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
+   TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
+   TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
   TClonesArray *branchJet = treeReader->UseBranch("Jet");
 
   Long64_t allEntries = treeReader->GetEntries();
@@ -121,9 +121,9 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
   // Loop over all events
   for(entry = 0; entry < allEntries; ++entry)
   {
+
     // Load selected branches with data from specified event
     treeReader->ReadEntry(entry);
-
     // Loop over all electrons in event
     for(i = 0; i < branchElectron->GetEntriesFast(); ++i)
     {
@@ -135,31 +135,33 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
     }
 
     // Loop over all photons in event
-    for(i = 0; i < branchPhoton->GetEntriesFast(); ++i)
-    {
-      photon = (Photon*) branchPhoton->At(i);
-
-      // skip photons with references to multiple particles
-      if(photon->Particles.GetEntriesFast() != 1) continue;
-
-      particle = (GenParticle*) photon->Particles.At(0);
-      plots->fPhotonDeltaPT->Fill((particle->PT - photon->PT)/particle->PT);
-      plots->fPhotonDeltaEta->Fill((particle->Eta - photon->Eta)/particle->Eta);
-      plots->fPhotonDeltaE->Fill((particle->E - photon->E)/particle->E);
-          
-    }
+    // for(i = 0; i < branchPhoton->GetEntriesFast(); ++i)
+    // {
+    //   photon = (Photon*) branchPhoton->At(i);
+    //   cout << "3" << endl;
+    //
+    //   // skip photons with references to multiple particles
+    //   if(photon->Particles.GetEntriesFast() != 1) continue;
+    //
+    //   particle = (GenParticle*) photon->Particles.At(0);
+    //   plots->fPhotonDeltaPT->Fill((particle->PT - photon->PT)/particle->PT);
+    //   plots->fPhotonDeltaEta->Fill((particle->Eta - photon->Eta)/particle->Eta);
+    //   plots->fPhotonDeltaE->Fill((particle->E - photon->E)/particle->E);
+    //
+    // }
 
     // Loop over all muons in event
     for(i = 0; i < branchMuon->GetEntriesFast(); ++i)
     {
       muon = (Muon*) branchMuon->At(i);
       particle = (GenParticle*) muon->Particle.GetObject();
+      cout << "4" << endl;
 
       plots->fMuonDeltaPT->Fill((particle->PT - muon->PT)/particle->PT);
       plots->fMuonDeltaEta->Fill((particle->Eta - muon->Eta)/particle->Eta);
     }
 
-    // cout << "--  New event -- " << endl;
+     cout << "--  New event -- " << endl;
 
     // Loop over all jets in event
     for(i = 0; i < branchJet->GetEntriesFast(); ++i)
@@ -168,7 +170,7 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
 
       momentum.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
 
-      // cout<<"Looping over jet constituents. Jet pt: "<<jet->PT<<", eta: "<<jet->Eta<<", phi: "<<jet->Phi<<endl;
+       cout<<"Looping over jet constituents. Jet pt: "<<jet->PT<<", eta: "<<jet->Eta<<", phi: "<<jet->Phi<<endl;
 
       // Loop over all jet's constituents
       for(j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
@@ -181,19 +183,19 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
         if(object->IsA() == GenParticle::Class())
         {
           particle = (GenParticle*) object;
-          // cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
+           cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
           momentum += particle->P4();
         }
         else if(object->IsA() == Track::Class())
         {
           track = (Track*) object;
-          // cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
+           //cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
           momentum += track->P4();
         }
         else if(object->IsA() == Tower::Class())
         {
           tower = (Tower*) object;
-          // cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
+           //cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
           momentum += tower->P4();
         }
       }
@@ -226,6 +228,7 @@ void Example3(const char *inputFile)
   BookHistograms(result, plots);
 
   AnalyseEvents(treeReader, plots);
+  gSystem->cd("Plots/test_plots/");
 
   PrintHistograms(result, plots);
 
