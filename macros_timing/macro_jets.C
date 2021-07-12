@@ -485,11 +485,21 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchJet = treeReader->UseBranch("Jet");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
     TClonesArray *branchJetAK8 = treeReader->UseBranch("JetAK8");
+
+    // TClonesArray *branchJetConst = treeReader->UseBranch("ConstituentsJet");
+    // TClonesArray *branchJetPUPPIConst = treeReader->UseBranch("ConstituentsJetPUPPI");
+    // TClonesArray *branchGenJetConst = treeReader->UseBranch("ConstituentsGenJet");
+
     TClonesArray *branchParticle = treeReader->UseBranch("Particle");
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
+    TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
+    TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
+    TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
+
     TClonesArray *branchJets[3] = {branchJet, branchJetPUPPI, branchGenJet};
+    //TClonesArray *branchConstituents[3] = {branchJetConst, branchJetPUPPIConst, branchGenJetConst};
 
     Long64_t allEntries = treeReader->GetEntries();
 
@@ -507,9 +517,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     GenParticle *PU_genpart;
 
     TObject* object;
+    TObject* object2;
+
     GenParticle* particle;
     GenParticle* constituent;
     Track* track;
+    Tower* tower;
     Vertex* vtx;
     Double_t Pvtx_T, Pvtx_Z;
 
@@ -521,7 +534,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     Int_t i;
     // Loop over all events
-    for(entry = 0; entry < allEntries; ++entry)
+    for(entry = 0; entry < 10; ++entry)
     {
       std::vector<GenParticle*> VBF_genparts;
       std::vector<GenParticle*> b_genparts;
@@ -609,35 +622,94 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             plots->fVBFmatchedjetDeltaR[m]->Fill(get_distance(jet, particle));
             plots->fVBFmatchedjetPT[m]->Fill(jet->PT);
             plots->fVBFmatchedjetEta[m]->Fill(jet->Eta);
+            // plots->fVBFmatchedjetNCharged[m]->Fill(jet->NCharged);
+            // plots->fVBFmatchedjetNNeutrals[m]->Fill(jet->NNeutrals);
 
-            for (size_t k = 0; k < jet->Particles.GetEntriesFast(); k++) {
-              object = jet->Particles.At(k);
-              if (object == 0) continue;
-              if (object->IsA() == GenParticle::Class()) {
-                constituent = (GenParticle*) jet->Particles.At(k);
-                if (constituent->Charge != 0) {
-                  plots->fVBFmatchedjetCHPT[m]->Fill(constituent->PT);
-                  plots->fVBFmatchedjetCHEta[m]->Fill(constituent->Eta);
-                  plots->fVBFmatchedjetCHT[m]->Fill((constituent->T - Pvtx_T )* 1000000000);
-                  plots->fVBFmatchedjetCHZ[m]->Fill((constituent->Z - Pvtx_Z )/1000);
-                }
-              }
-            }
+            int nparts = 0;
+            int nCparts = 0;
+            int nNparts = 0;
+            int nGamma = 0;
+            int nOther = 0;
 
+            // for (size_t k = 0; k < branchConstituents[m]->GetEntriesFast(); k++) {
+            //   constituent = (GenParticle*) branchConstituents[m]->At(k);
+            //     ++nparts;
+            //     if (id(constituent) == 0) { // get charged hadrons
+            //       ++nCparts;
+            //       cout << "CH PID " << constituent->PID << endl;
+            //
+            //       plots->fVBFmatchedjetCHPT[m]->Fill(constituent->PT);
+            //       plots->fVBFmatchedjetCHEta[m]->Fill(constituent->Eta);
+            //       plots->fVBFmatchedjetCHT[m]->Fill((constituent->T - Pvtx_T )* 1000000000);
+            //       plots->fVBFmatchedjetCHZ[m]->Fill((constituent->Z - Pvtx_Z )/1000);
+            //     }
+            //     if (id(constituent) == 1) { // get neutral hadrons
+            //       ++nNparts;
+            //       cout << "NH PID " << constituent->PID << endl;
+            //     }
+            //     if (id(constituent) == 2 && constituent->M1 == 1) { // get gamma
+            //       ++nGamma;
+            //       cout << "gamma PID " << constituent->PID << endl;
+            //     }
+            //     if (id(constituent) == 3) { // get gamma
+            //       ++nOther;
+            //       cout << "Other PID " << constituent->PID << endl;
+            //     }
+            // }
+            // cout << "Number of particles " << nparts << endl;
+            // cout << "Number of charged particles " << nCparts << endl;
+            // cout << "Number of neutral particles " << nNparts << endl;
+            // cout << "Number of gamma particles " << nGamma << endl;
+            // cout << "Number of other particles " << nOther << endl;
+
+            cout<<"Looping over jet constituents. Jet pt: "<<jet->PT<<", eta: "<<jet->Eta<<", phi: "<<jet->Phi<<endl;
+            cout << "Constituents Size "<< jet->Constituents.GetEntriesFast() << endl;
+            cout << " charged " << jet->NCharged << endl;
+            cout << " neutral " << jet->NNeutrals << endl;
             // Loop over all jet's constituents
             for(size_t j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
             {
               object = jet->Constituents.At(j);
+              //cout << j << endl;
               // Check if the constituent is accessible
-              if(object == 0) continue;
+              if(object == 0)
+              {
+                continue;
+              }
 
-              if(object->IsA() == Track::Class())
+              if(object->IsA() == GenParticle::Class())
+              {
+                particle = (GenParticle*) object;
+                 cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
+
+                 cout << particle->PID << endl;
+              }
+              else if(object->IsA() == Track::Class())
               {
                 track = (Track*) object;
-                cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
-                //momentum += track->P4();
+                 cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
+                 // object2 = track->Particle;
+                 // if(object2 == 0) continue;
+                 // if(object2->IsA() == GenParticle::Class())
+                 // {
+                 //   particle = (GenParticle*) object2;
+                 //   cout << "Particle PID " <<particle->PID << endl;
+                 // }
               }
-            }
+              else if(object->IsA() == Tower::Class())
+              {
+                tower = (Tower*) object;
+                 cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
+                 //cout << tower->Particle->PID << endl;
+
+              }
+            } // END JET CONSTITUENTS
+
+                // for(Int_t j = 0; j < jet->Particles.GetEntriesFast(); ++j)
+                // {
+                //   particle = (GenParticle*) jet->Particles.At(j);
+                //   cout<<"Particle PID "<< ((GenParticle*) particle)->PID <<endl;
+                // }
           }
           else{
             // rest of the jets
@@ -691,10 +763,10 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/TimeSmearing/tracks");
+    gSystem->cd("Plots/test_plots/");
     cout << "Print hists "<< endl;
 
-    PrintHistograms(result, plots);
+    //PrintHistograms(result, plots);
 
     result->Write("results.root");
 

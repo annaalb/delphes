@@ -153,6 +153,7 @@ void Merger::Process()
   candidate->Momentum.SetPtEtaPhiE(sumPT, 0.0, 0.0, sumE);
 
   fEnergyOutputArray->Add(candidate);
+
 }
 
 //------------------------------------------------------------------------------

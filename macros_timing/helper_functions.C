@@ -108,3 +108,34 @@ bool is_b(GenParticle *genparticle)
         return true;}
     return false;
 }
+
+// id of jet constituents
+// 0 - charged hadrons
+// 1 - neutral hadrons
+// 2 - gamma
+// 3 - other
+Int_t id(GenParticle *particle)
+{
+  switch (std::abs(particle->PID)) {
+    case 211: // -+ pion
+      return 0;
+    case 321: // -+ kaon
+      return 0;
+    case 2212: // proton -+
+      return 0;
+    case 11: // elec
+      return 3;
+    case 13: // muon
+      return 3;
+    case 22: // gamma
+      return 2;
+    case 130: // K0
+      return 1;
+    case 111: // pion 0
+      return 1;
+    case 2112: // neutron
+      return 1;
+    default:
+      return 3;
+    }
+}

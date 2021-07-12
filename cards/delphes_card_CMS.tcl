@@ -2,6 +2,8 @@
 # Order of execution of various modules
 #######################################
 
+set MaxEvents 10
+
 set ExecutionPath {
   ParticlePropagator
 
@@ -14,14 +16,14 @@ set ExecutionPath {
   MuonMomentumSmearing
 
   TrackMerger
- 
+
   ECal
   HCal
- 
+
   Calorimeter
   EFlowMerger
   EFlowFilter
-  
+
   PhotonEfficiency
   PhotonIsolation
 
@@ -39,7 +41,7 @@ set ExecutionPath {
   NeutrinoFilter
   GenJetFinder
   GenMissingET
-  
+
   FastJetFinder
   FatJetFinder
 
@@ -403,7 +405,7 @@ module PdgCodeFilter ElectronFilter {
 module PdgCodeFilter ChargedHadronFilter {
   set InputArray HCal/eflowTracks
   set OutputArray chargedHadrons
-  
+
   add PdgCode {11}
   add PdgCode {-11}
   add PdgCode {13}
@@ -443,7 +445,7 @@ module Merger EFlowMerger {
 module PdgCodeFilter EFlowFilter {
   set InputArray EFlowMerger/eflow
   set OutputArray eflow
-  
+
   add PdgCode {11}
   add PdgCode {-11}
   add PdgCode {13}
@@ -724,7 +726,7 @@ module BTagging BTagging {
   # gluon's PDG code has the lowest priority
 
   # based on arXiv:1211.4462
-  
+
   # default efficiency formula (misidentification rate)
   add EfficiencyFormula {0} {0.01+0.000038*pt}
 
@@ -786,13 +788,13 @@ module TreeWriter TreeWriter {
   add Branch TrackMerger/tracks Track Track
   add Branch Calorimeter/towers Tower Tower
 
-  add Branch HCal/eflowTracks EFlowTrack Track
+#  add Branch HCal/eflowTracks EFlowTrack Track
   add Branch ECal/eflowPhotons EFlowPhoton Tower
   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch GenJetFinder/jets GenJet Jet
   add Branch GenMissingET/momentum GenMissingET MissingET
- 
+
   add Branch UniqueObjectFinder/jets Jet Jet
   add Branch UniqueObjectFinder/electrons Electron Electron
   add Branch UniqueObjectFinder/photons Photon Photon

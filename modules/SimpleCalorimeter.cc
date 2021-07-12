@@ -501,6 +501,7 @@ void SimpleCalorimeter::FinalizeTower()
       track->AddCandidate(mother);
 
       fEFlowTrackOutputArray->Add(track);
+
     }
   }
 
@@ -521,6 +522,7 @@ void SimpleCalorimeter::FinalizeTower()
       track->AddCandidate(mother);
       track->Momentum.SetPtEtaPhiM(track->Momentum.Pt()*rescaleFactor, track->Momentum.Eta(), track->Momentum.Phi(), track->Momentum.M());
       fEFlowTrackOutputArray->Add(track);
+
     }
   }
 }

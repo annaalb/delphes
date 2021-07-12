@@ -32,7 +32,6 @@ set ExecutionPath {
   MuonMomentumSmearing
 
   TrackMerger
-  TrackSmearing
   TimeSmearing
 
   ECal
@@ -505,21 +504,23 @@ module TrackSmearing TrackSmearing {
   set OutputArray tracks
   set ApplyToPileUp true
 
-  # from http://mersi.web.cern.ch/mersi/layouts/.private/Baseline_tilted_200_Pixel_1_1_1/index.html
-  source trackResolution.tcl
+  source ../trackResolutionCMS.tcl
 }
 
 ########################################
 #   Time Smearing
 ########################################
 
-module TimeSmearing TimeSmearing {
-  set InputArray TrackSmearing/tracks
+ module TimeSmearing TimeSmearing {
+  # set InputArray TrackSmearing/tracks
+   set InputArray TrackMerger/tracks
   set OutputArray tracks
 
   # assume 30 ps resolution for now
   set TimeResolution 30E-12
-}
+  #set TimeResolution 30
+
+ }
 
 #############
 #   ECAL
@@ -997,6 +998,7 @@ module FastJetFinder GenJetFinder {
   set InputArray NeutrinoFilter/filteredParticles
 
   set OutputArray jets
+  set ConstituentsOutputArray constituents
 
   # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
   set JetAlgorithm 6
@@ -1079,6 +1081,7 @@ module FastJetFinder FastJetFinder {
   set InputArray EFlowMergerCHS/eflow
 
   set OutputArray jets
+  set ConstituentsOutputArray constituents
 
   set AreaAlgorithm 5
 
@@ -1154,6 +1157,7 @@ module FastJetFinder FastJetFinderPUPPI {
   set InputArray RunPUPPI/PuppiParticles
 
   set OutputArray jets
+  set ConstituentsOutputArray constituents
 
   # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
   set JetAlgorithm 6
@@ -4165,17 +4169,19 @@ module TreeWriter TreeWriter {
   #add Branch NeutrinoFilterPU/filteredParticlesPU PUParticle GenParticle
   add Branch PileUpMerger/vertices Vertex Vertex
   add Branch TrackMerger/tracks Track Track
-  add Branch TimeSmearing/tracks TrackSmearing Track
+  ##add Branch TrackSmearing/tracks TrackSmearing Track
+  add Branch TimeSmearing/tracks TimeSmearing Track
 
   add Branch GenJetFinder/jets GenJet Jet
+  #add Branch GenJetFinder/constituents ConstituentsGenJet GenParticle
   add Branch GenJetFinderPU/jetsPU GenJetPU Jet
   #add Branch GenJetFinderPU/constituentsPU ConstituentsPU GenParticle
   add Branch GenJetFinderAK8/jetsAK8 GenJetAK8 Jet
   add Branch GenMissingET/momentum GenMissingET MissingET
 
-#  add Branch HCal/eflowTracks EFlowTrack Track
-#  add Branch ECal/eflowPhotons EFlowPhoton Tower
-#  add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
+   add Branch HCal/eflowTracks EFlowTrack Track
+   add Branch ECal/eflowPhotons EFlowPhoton Tower
+   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch PhotonLooseID/photons PhotonLoose Photon
   add Branch PhotonTightID/photons PhotonTight Photon
@@ -4184,7 +4190,7 @@ module TreeWriter TreeWriter {
   add Branch MuonLooseIdEfficiency/muons MuonLoose Muon
   add Branch MuonTightIdEfficiency/muons MuonTight Muon
 
-#  add Branch PhotonEfficiencyCHS/photons PhotonCHS Photon
+  add Branch PhotonEfficiencyCHS/photons PhotonCHS Photon
   add Branch ElectronEfficiencyCHS/electrons ElectronCHS Electron
   add Branch MuonLooseIdEfficiencyCHS/muons MuonLooseCHS Muon
   add Branch MuonTightIdEfficiencyCHS/muons MuonTightCHS Muon
@@ -4193,6 +4199,9 @@ module TreeWriter TreeWriter {
   add Branch JetEnergyScalePUPPI/jets JetPUPPI Jet
   add Branch JetEnergyScaleAK8/jets JetAK8 Jet
   add Branch JetEnergyScalePUPPIAK8/jets JetPUPPIAK8 Jet
+
+  #add Branch FastJetFinder/constituents ConstituentsJet GenParticle
+  #add Branch FastJetFinderPUPPI/constituents ConstituentsJetPUPPI GenParticle
 
   add Branch Rho/rho Rho Rho
 

@@ -22,6 +22,8 @@ set ExecutionPath {
   ECal
   HCal
 
+  Calorimeter
+
   ElectronFilter
   TrackPileUpSubtractor
   NeutralTowerMerger

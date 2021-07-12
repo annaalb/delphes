@@ -32,6 +32,8 @@ struct MyPlots
   TH1* ftrackY[2];
   TH1* ftrackZ[2];
   TH1* ftrackT[2];
+  TH1* ftrackTOuter[2];
+
   TH1* ftrackPosT[2];
   TH1* ftrackInitialPosT[2];
 
@@ -80,26 +82,29 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   plots->ftrackT[i] = result->AddHist1D(
     "track_T_"+name[i], "track T",
     "track T [ns]", "number of tracks", 100, -1, 1);
-    // plots->ftrackPosT[i] = result->AddHist1D(
-    //   "track_T_"+name[i], "track T",
-    //   "track Position.T [ns]", "number of tracks", 100, -1, 1);
-    //   plots->ftrackInitialPosT[i] = result->AddHist1D(
-    //     "track_Init_Pos_T_"+name[i], "track T",
-    //     "track InitialPosition.T [ns]", "number of tracks", 100, -1, 1);
+    plots->ftrackTOuter[i] = result->AddHist1D(
+      "track_TOuter_"+name[i], "track TOuter",
+      "track TOuter [ns]", "number of tracks", 100, 0.0, 30);
+    plots->ftrackPosT[i] = result->AddHist1D(
+      "track_PosT_"+name[i], "track T",
+      "track Position.T [ns]", "number of tracks", 100, -1, 1);
+      plots->ftrackInitialPosT[i] = result->AddHist1D(
+        "track_Init_Pos_T_"+name[i], "track T",
+        "track InitialPosition.T [ns]", "number of tracks", 100, -1, 1);
 
   plots->fdeltaT[i] = result->AddHist1D(
-    "track_T_minus_vtx_T_"+name[i], "track T - vtx T",
+    "track_T_minus_PV_T_"+name[i], "track T - PV T",
     "track T - PV T [ns]", "number of tracks", 100, -1, 1);
     plots->fTres[i] = result->AddHist1D(
-      "track_T_res_"+name[i], "track T - vtx T / Tres",
-      "track T - PV T / T_{res} [ns]", "", 100, -1, 1);
+      "track_T_res_"+name[i], "track pos T - initPos T / Tres",
+      "track pos T - initPos T / T_{res} [ns]", "", 100, -1, 1000);
   plots->fdeltaZ[i] = result->AddHist1D(
-    "track_Z_minus_vtx_Z_"+name[i], "track Z - vtx Z",
+    "track_Z_minus_PV_Z_"+name[i], "track Z - vtx Z",
     "track Z - PV Z [m]", "number of tracks", 100, -0.25, 0.25);
 
   plots->ftrackErrorT[i] = result->AddHist1D(
     "track_error_t_"+name[i], "track error t",
-    "track error T [ns]", "number of tracks", 100, 0, 0.01); // track position error (t component)
+    "track error T [ns]", "number of tracks", 5, 0, 0.05); // track position error (t component)
   // plots->ftrackErrorX = result->AddHist1D(
   //   "track_error_x", "track error X",
   //   "track error X [mm]", "number of tracks", 100, 0.0, 0.01); // track position error (x component)
@@ -122,12 +127,13 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     cout << "** Chain contains " << allEntries << " events" << endl;
 
     TClonesArray *branchTrack = treeReader->UseBranch("Track");
-    TClonesArray *branchTrackSmeared = treeReader->UseBranch("TrackSmearing");
+    TClonesArray *branchTrackSmeared = treeReader->UseBranch("TimeSmearing");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
     TClonesArray *branchTracks[2] = {branchTrack, branchTrackSmeared};
 
     Track *track;
+    Candidate *candidate;
     GenParticle *genparticle;
     Vertex *vtx;
 
@@ -147,6 +153,16 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       // Load selected branches with data from specified event
       treeReader->ReadEntry(entry);
 
+      vtxT = 0;
+      // get PV
+      for (size_t v = 0; v < branchVtx->GetEntriesFast(); v++) {
+        vtx = (Vertex*) branchVtx->At(v);
+        if (0 == vtx->Index) {
+         vtxT = vtx->T;
+         vtxZ = vtx->Z;
+        }
+      }
+      // get tracks
       for (size_t i = 0; i < 2; i++) {
         TClonesArray* branch = branchTracks[i];
         for(Int_t k = 0; k < branch->GetEntriesFast(); ++k)
@@ -157,40 +173,25 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           plots->ftrackPT[i]->Fill(track->PT);
           plots->ftrackEta[i]->Fill(track->Eta);
           plots->ftrackMass[i]->Fill(track->Mass);
-
+          trackT = track->T;
+          trackZ = track->Z;
           plots->ftrackX[i]->Fill(track->X);
           plots->ftrackY[i]->Fill(track->Y);
-          plots->ftrackZ[i]->Fill(track->Z/1000); // to have it in m
-          plots->ftrackT[i]->Fill(track->T * 1000000000); // to have it in ns
-          // plots->ftrackPosT[i]->Fill(track->Position.T() * 1000000000); // to have it in ns
-          // plots->ftrackInitialPosT[i]->Fill(track->InitialPosition.T() * 1000000000); // to have it in ns
-
+          plots->ftrackZ[i]->Fill(trackZ/1000); // to have it in m
+          plots->ftrackT[i]->Fill(trackT * 1000000000); // to have it in ns
+          plots->ftrackTOuter[i]->Fill(track->TOuter * 1000000000); // to have it in ns
+          double trackTOF = track->TOuter - track->T ;
+          plots->fTres[i]->Fill((trackTOF * 1000000000)/0.03); // to have it in ns
           plots->ftrackErrorT[i]->Fill(track->ErrorT* 1000000000); // track position error (t component)
 
-           trackT = track->T;
-           trackZ = track->Z;
-           vtxT = 0;
-           // cout << "track-> VertexIndex" << track->VertexIndex << endl;
-           // cout << "track T" << trackT << endl;
-           // cout << "track Z" << trackZ << endl;
-          for (size_t v = 0; v < branchVtx->GetEntriesFast(); v++) {
-            vtx = (Vertex*) branchVtx->At(v);
-
-            if (0 == vtx->Index) {
-              vtxT = vtx->T;
-              vtxZ = vtx->Z;
-              // cout << "vtx" << vtx->Index << endl;
-              // cout << "vtx T" << vtxT << endl;
-              // cout << "vtx Z" << vtxZ << endl;
-
-            }
-          }
            deltaT = trackT - vtxT;
            deltaZ = trackZ - vtxZ;
           plots->fdeltaT[i]->Fill(deltaT * 1000000000); // to have it in ns
           plots->fdeltaZ[i]->Fill(deltaZ / 1000); // to have it in m
-          plots->fTres[i]->Fill((deltaT * 1000000000)/0.03); // to have it in ns
-
+                // Get track and associated particle //TODO try this
+                Track *t = static_cast<Track*>(branch->At(k));
+                GenParticle *p = static_cast<GenParticle*>(t->Particle.GetObject());
+                cout << p->PID << "\n";
 
         }
       }
@@ -223,7 +224,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     SetupGlobalStyle();
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/TimeSmearing/tracks");
+    gSystem->cd("Plots/test_plots/");
 
     PrintHistograms(result, plots);
 

@@ -87,9 +87,9 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
 {
   TClonesArray *branchParticle = treeReader->UseBranch("Particle");
   TClonesArray *branchElectron = treeReader->UseBranch("Electron");
-  TClonesArray *branchPhoton = treeReader->UseBranch("Photon");
-  TClonesArray *branchMuon = treeReader->UseBranch("Muon");
-   //TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
+  TClonesArray *branchPhoton = treeReader->UseBranch("PhotonLoose");
+  TClonesArray *branchMuon = treeReader->UseBranch("MuonLoose");
+   TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
    TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
    TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
   TClonesArray *branchJet = treeReader->UseBranch("Jet");
@@ -119,7 +119,7 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
   Int_t i, j, pdgCode;
 
   // Loop over all events
-  for(entry = 0; entry < allEntries; ++entry)
+  for(entry = 0; entry < 1; ++entry)
   {
 
     // Load selected branches with data from specified event
@@ -151,15 +151,15 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
     // }
 
     // Loop over all muons in event
-    for(i = 0; i < branchMuon->GetEntriesFast(); ++i)
-    {
-      muon = (Muon*) branchMuon->At(i);
-      particle = (GenParticle*) muon->Particle.GetObject();
-      cout << "4" << endl;
-
-      plots->fMuonDeltaPT->Fill((particle->PT - muon->PT)/particle->PT);
-      plots->fMuonDeltaEta->Fill((particle->Eta - muon->Eta)/particle->Eta);
-    }
+    // for(i = 0; i < branchMuon->GetEntriesFast(); ++i)
+    // {
+    //   muon = (Muon*) branchMuon->At(i);
+    //   particle = (GenParticle*) muon->Particle.GetObject();
+    //   cout << "4" << endl;
+    //
+    //   plots->fMuonDeltaPT->Fill((particle->PT - muon->PT)/particle->PT);
+    //   plots->fMuonDeltaEta->Fill((particle->Eta - muon->Eta)/particle->Eta);
+    // }
 
      cout << "--  New event -- " << endl;
 
@@ -171,7 +171,9 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
       momentum.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
 
        cout<<"Looping over jet constituents. Jet pt: "<<jet->PT<<", eta: "<<jet->Eta<<", phi: "<<jet->Phi<<endl;
-
+       cout << "Constituents Size "<< jet->Constituents.GetEntriesFast() << endl;
+       cout << " charged " << jet->NCharged << endl;
+       cout << " neutral " << jet->NNeutrals << endl;
       // Loop over all jet's constituents
       for(j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
       {
@@ -189,13 +191,13 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
         else if(object->IsA() == Track::Class())
         {
           track = (Track*) object;
-           //cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
+           cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
           momentum += track->P4();
         }
         else if(object->IsA() == Tower::Class())
         {
           tower = (Tower*) object;
-           //cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
+           cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
           momentum += tower->P4();
         }
       }

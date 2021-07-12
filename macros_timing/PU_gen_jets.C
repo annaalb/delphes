@@ -26,6 +26,8 @@ struct MyPlots
   TH1 *fPUgenjetPT[6];
   TH1 *fPUgenjetRho;
   TH1 *fPUgenjetETA;
+  TH1 *fPUgenjetNCharged;
+  TH1 *fPUgenjetNNeutrals;
 
   TH1 *fPUgenjetConstPT;
   TH1 *fPUgenjetConstETA;
@@ -34,6 +36,8 @@ struct MyPlots
   TH1 *fPUgenjetCHEta;
   TH1 *fPUgenjetCHT;
   TH1 *fPUgenjetCHZ;
+  TH1 *fPUgenjetCHdT;
+  TH1 *fPUgenjetCHdZ;
   TH1 *fPUgenjetCHPosT;
 
   TH1 *fPUgenparticlePT;
@@ -44,6 +48,9 @@ struct MyPlots
 
   TH1 *fbmatchedjetDeltaR;
   TH1 *fVBFmatchedjetDeltaR;
+
+  TH1 *fvtxDeltaT;
+  TH1 *fPvtxT;
 
 };
 
@@ -83,6 +90,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     "PU_genjet_eta", "PU genjet #eta",
     "PU genjet #eta ", "number of genjets", 100, -10.0, 10.0);
 
+    plots->fPUgenjetNCharged = result->AddHist1D(
+      "PU_genjet_NCharged", "PU genjet NCharged",
+      "number of NCharged", "number of jets", 100, 0.0, 200.0);
+      plots->fPUgenjetNNeutrals = result->AddHist1D(
+        "PU_genjet_NNeutrals", "PU genjet NNeutrals",
+        "number of NNeutrals", "number of jets", 100, 0.0, 200.0);
     // genjets constituents
   plots->fPUgenjetConstPT = result->AddHist1D(
     "PU_genjet_constituents_pt", "PU genjet constituents P_{T}",
@@ -98,11 +111,18 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       "PU_genjet_CH_eta", "PU CH #eta",
       "PU genjet CH #eta ", "number of particles", 100, -5.0, 5.0);
     plots->fPUgenjetCHT = result->AddHist1D(
-      "PU_genjet_CH_dT", "CH T - PV T",
-      "PU CH T - PV T [ns]", "number of particles", 100, -1, 1);
+      "PU_genjet_CH_T", "CH T - PV T",
+      "PU CH T  [ns]", "number of particles", 100, -1, 1);
     plots->fPUgenjetCHZ = result->AddHist1D(
-      "PU_genjet_CH_dZ", "track Z - vtx Z",
-      "PU CH Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+      "PU_genjet_CH_Z", "track Z - vtx Z",
+      "PU CH Z  [m]", "number of particles", 100, -0.25, 0.25);
+
+      plots->fPUgenjetCHdT = result->AddHist1D(
+        "PU_genjet_CH_dT", "CH T - PV T",
+        "PU CH T - PV T [ns]", "number of particles", 100, -1, 1);
+      plots->fPUgenjetCHdZ = result->AddHist1D(
+        "PU_genjet_CH_dZ", "track Z - vtx Z",
+        "PU CH Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
 
       plots->fPUgenjetCHPosT = result->AddHist1D(
         "PU_genjet_CH_Pos_dT", "CH T - PV T",
@@ -137,6 +157,14 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     // plots->fdeltaZ[i] = result->AddHist1D(
     //   "PU_track_Z_minus_vtx_Z_", "track Z - vtx Z",
     //   "PU track Z - PV Z [m]", "number of tracks", 100, -0.25, 0.25);
+
+    plots->fvtxDeltaT = result->AddHist1D(
+      "vtx_dT", "vtx T - PV T",
+      "vtx T - PV T [ns]", "number of vtx", 100, -1, 1);
+
+      plots->fPvtxT = result->AddHist1D(
+        "P_vtx_T", " PV T",
+        "PV T [ns]", "number of vtx", 100, -1, 1);
   }
 
   //------------------------------------------------------------------------------
@@ -150,7 +178,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchGenJetPU = treeReader->UseBranch("GenJetPU");
     TClonesArray *branchGenJetPURho = treeReader->UseBranch("Rho");
     //TClonesArray *branchParticlePU = treeReader->UseBranch("PUParticle");
-    //TClonesArray *branchConstituentsPU = treeReader->UseBranch("ConstituentsPU");
+    TClonesArray *branchConstituentsPU = treeReader->UseBranch("ConstituentsPU");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
     Long64_t allEntries = treeReader->GetEntries();
@@ -177,8 +205,9 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     Int_t i;
     // Loop over all events
-    for(entry = 0; entry < allEntries; ++entry)
+    for(entry = 0; entry < 1; ++entry)
     {
+      //cout << entry << endl;
       // Load selected branches with data from specified event
       treeReader->ReadEntry(entry);
 
@@ -207,10 +236,13 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       {
         // Take vtx
         vtx = (Vertex*) branchVtx->At(i);
-        if (vtx->Index == 0) { //TODO is this always the PV?
+        if (vtx->Index == 0) {
           Pvtx_Z = vtx->Z;
           Pvtx_T = vtx->T;
+          plots->fPvtxT->Fill(( Pvtx_T) * 1000000000);
           }
+        plots->fvtxDeltaT->Fill((vtx->T - Pvtx_T) * 1000000000);
+
       }
     //---------Analyse GenJet-------
       if(branchGenJetPU->GetEntriesFast() > 0)
@@ -223,20 +255,28 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             if(object == 0) continue;
             if(object->IsA() == GenParticle::Class())
             {  particle = (GenParticle*) object;
-              plots->fPUgenjetConstPT->Fill(particle->PT);
-              plots->fPUgenjetConstETA->Fill(particle->Eta);
+              // plots->fPUgenjetConstPT->Fill(particle->PT);
+              // plots->fPUgenjetConstETA->Fill(particle->Eta);
+              // cout << "eta " << particle->Eta << endl;
+              // cout << "pt " << particle->PT << endl;
+              // cout << "Charge " << particle->Charge << endl;
               if (particle->Charge != 0) {
-                plots->fPUgenjetCHPT->Fill(particle->PT);
-                plots->fPUgenjetCHEta->Fill(particle->Eta);
-                plots->fPUgenjetCHT->Fill((particle->T - Pvtx_T )* 1000000000);
-                plots->fPUgenjetCHZ->Fill((particle->Z - Pvtx_Z )/1000);
+                // plots->fPUgenjetCHPT->Fill(particle->PT);
+                // plots->fPUgenjetCHEta->Fill(particle->Eta);
+                // plots->fPUgenjetCHT->Fill((particle->T  )* 1000000000);
+                // plots->fPUgenjetCHZ->Fill((particle->Z  )/1000);
+                // cout << "entry " << entry << endl;
+                // //
+                // cout << "PV time: " << Pvtx_T*1000000000 << endl;
+                // cout << "particle time: " << particle->T*1000000000 << endl;
+
               }
-              if (particle->IsPU == 0) {
-                ++nstableParts;
-              }
-              if (particle->IsPU == 1) {
-                ++nPUParts;
-              }
+              // if (particle->IsPU == 0) {
+              //   ++nstableParts;
+              // }
+              // if (particle->IsPU == 1) {
+              //   ++nPUParts;
+              // }
             }
             if(object->IsA() == Candidate::Class())
             {  candidate = (Candidate*) object;
@@ -254,6 +294,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           }
           plots->fPUgenjetPT[5]->Fill(genjet->PT);
           plots->fPUgenjetETA->Fill(genjet->Eta);
+          plots->fPUgenjetNCharged->Fill(genjet->NCharged);
+          plots->fPUgenjetNNeutrals->Fill(genjet->NNeutrals);
           //}
           particle = get_closest_particle(genjet, genparts, 5);
           if (is_b(particle)) {
@@ -266,6 +308,48 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           }
         }
       }
+
+      Int_t ncharged=0;
+      Int_t nneutral=0;
+      for (size_t l = 0; l < branchConstituentsPU->GetEntriesFast(); l++) {
+        object = branchConstituentsPU->At(l);
+        // Check if the constituent is accessible
+        if(object == 0) continue;
+        if(object->IsA() == GenParticle::Class())
+        {  particle = (GenParticle*) object;
+          plots->fPUgenjetConstPT->Fill(particle->PT);
+          plots->fPUgenjetConstETA->Fill(particle->Eta);
+          // cout << "eta " << particle->Eta << endl;
+          // cout << "pt " << particle->PT << endl;
+          // cout << "Charge " << particle->Charge << endl;
+          if (particle->Charge != 0 ) {
+            plots->fPUgenjetCHPT->Fill(particle->PT);
+            plots->fPUgenjetCHEta->Fill(particle->Eta);
+            plots->fPUgenjetCHT->Fill((particle->T )* 1000000000);
+            plots->fPUgenjetCHZ->Fill((particle->Z )/1000);
+            plots->fPUgenjetCHdT->Fill((particle->T  - Pvtx_T)* 1000000000);
+            plots->fPUgenjetCHdZ->Fill((particle->Z  - Pvtx_Z)/1000);
+            //cout << "CH PID " << particle->PID << endl;
+            ++ncharged;
+            // cout << "entry " << entry << endl;
+            // //
+            // cout << "PV time: " << Pvtx_T*1000000000 << endl;
+            // cout << "particle time: " << particle->T*1000000000 << endl;
+
+          }
+          if (particle->Charge == 0 && particle->PID != 22) {
+            cout << "NH PID " << particle->PID << endl;
+            ++nneutral;
+          }
+          if (particle->IsPU == 0) {
+            ++nstableParts;
+          }
+          if (particle->IsPU == 1) {
+            ++nPUParts;
+          }
+        }
+
+      }
       //---------Analyse Rho-------
         if(branchGenJetPURho->GetEntriesFast() > 0)
         {
@@ -274,44 +358,11 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             plots->fPUgenjetRho->Fill(rho->Rho);
             }
           }
-      //---------Analyse Genparticles-------
-        // if(branchParticlePU->GetEntriesFast() > 0)
-        // {
-        //   for (size_t k = 0; k < branchParticlePU->GetEntriesFast(); k++) {
-        //     genparticle = (GenParticle*) branchParticlePU->At(k);
-        //       if (genparticle->IsPU == 0) {
-        //         ++nstableParts;
-        //       }
-        //       if (genparticle->IsPU == 1) {
-        //         ++nPUParts;
-        //       }
-        //     //if (genjet->PT > 30){
-        //       plots->fPUgenparticlePT->Fill(genparticle->PT);
-        //       plots->fPUgenparticleETA->Fill(genparticle->Eta);
-        //     //}
-        //   }
-        // }
 
-        //---------Analyse Genparticles-------
-          // if(branchConstituentsPU->GetEntriesFast() > 0)
-          // {
-          //   for (size_t k = 0; k < branchConstituentsPU->GetEntriesFast(); k++) {
-          //     candidate = (GenParticle*) branchConstituentsPU->At(k);
-          //       // if (candidate->IsPU == 0) {
-          //       //   ++nstableParts;
-          //       // }
-          //       // if (candidate->IsPU == 1) {
-          //       //   ++nPUParts;
-          //       // }
-          //     //if (genjet->PT > 30){
-          //       plots->fconstituentsPT->Fill(candidate->PT);
-          //       plots->fconstituentsETA->Fill(candidate->Eta);
-          //     //}
-          //   }
-          // }
-
-        //cout << "Number of stable Parts: "<< nstableParts << endl;
-      //  cout << "Number of PU Parts: "<< nPUParts << endl;
+        cout << "Number of stable Parts: "<< nstableParts << endl;
+       cout << "Number of PU Parts: "<< nPUParts << endl;
+       cout << "Charged hadrons " <<ncharged << endl;
+       cout << "Neutral hadrons " <<nneutral << endl;
 
     }// end loop over entries
   }//end void
@@ -344,7 +395,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/TimeSmearing/tracks");
+    gSystem->cd("Plots/test_plots/");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);
