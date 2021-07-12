@@ -73,9 +73,12 @@ void TimeSmearing::Init()
   fResolutionFormula->Compile(GetString("TimeResolution", "30e-12"));
 
   // import track input array
-  fTrackInputArray = ImportArray(GetString("TrackInputArray", "MuonMomentumSmearing/muons"));
+  //fTrackInputArray = ImportArray(GetString("TrackInputArray", "MuonMomentumSmearing/muons"));
+  fTrackInputArray = ImportArray(GetString("TrackInputArray", "TrackMerger/tracks"));
+
   fItTrackInputArray = fTrackInputArray->MakeIterator();
 
+std::cout << "Init: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
 
   // create output array
   fOutputArray = ExportArray(GetString("OutputArray", "tracks"));
@@ -85,6 +88,8 @@ void TimeSmearing::Init()
 
 void TimeSmearing::Finish()
 {
+  std::cout << "Finish: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
+
   if(fItTrackInputArray) delete fItTrackInputArray;
 }
 
@@ -92,13 +97,15 @@ void TimeSmearing::Finish()
 
 void TimeSmearing::Process()
 {
+  std::cout << "Process: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
+
   Candidate *candidate, *mother;
   Double_t tf_smeared, tf;
   Double_t eta, energy;
   Double_t timeResolution;
 
   const Double_t c_light = 2.99792458E8;
-
+std::cout << "Moin ---------------------------" << '\n';
   fItTrackInputArray->Reset();
   while((candidate = static_cast<Candidate *>(fItTrackInputArray->Next())))
   {
@@ -118,16 +125,18 @@ void TimeSmearing::Process()
 
     mother = candidate;
     candidate = static_cast<Candidate *>(candidate->Clone());
+    std::cout << "Position.T before smearing " << candidate->Position.T() << '\n';  // smeared final time of the track
 
-    candidate->Position.SetT(tf_smeared * 1.0E3 * c_light);
+    candidate->Position.SetT(tf_smeared * 1.0E3 * c_light); // apply smearing on final time of track
     candidate->ErrorT = timeResolution * 1.0E3 * c_light;
-    static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf * 1.0E3 * c_light);
-    std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';
 
-    std::cout << "Initial Time " << candidate->InitialPosition.T() << '\n';
-    std::cout << "Position.SetT " << candidate->Position.T() << '\n';
+    static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf_smeared * 1.0E3 * c_light);
+        std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';
 
-std::cout << "Error T "<< candidate->ErrorT << '\n';
+        std::cout << "Initial Time " << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
+        std::cout << "Position.SetT " << candidate->Position.T() << '\n';  // smeared final time of the track
+
+    std::cout << "Error T "<< candidate->ErrorT << '\n';
     candidate->AddCandidate(mother);
     fOutputArray->Add(candidate);
   }
