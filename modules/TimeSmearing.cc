@@ -101,6 +101,8 @@ void TimeSmearing::Process()
 
   Candidate *candidate, *mother;
   Double_t tf_smeared, tf;
+  Double_t ti_smeared, ti;
+
   Double_t eta, energy;
   Double_t timeResolution;
 
@@ -115,6 +117,7 @@ std::cout << "Moin ---------------------------" << '\n';
     const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     tf = candidateFinalPosition.T() * 1.0E-3 / c_light;
+    ti = candidateInitialPosition.T() * 1.0E-3 / c_light;
 
     eta = candidateMomentum.Eta();
     energy = candidateMomentum.E();
@@ -122,19 +125,23 @@ std::cout << "Moin ---------------------------" << '\n';
     // apply smearing formula
     timeResolution = fResolutionFormula->Eval(0.0, eta, 0.0, energy);
     tf_smeared = gRandom->Gaus(tf, timeResolution);
+    ti_smeared = gRandom->Gaus(ti, timeResolution);
 
     mother = candidate;
     candidate = static_cast<Candidate *>(candidate->Clone());
     std::cout << "Position.T before smearing " << candidate->Position.T() << '\n';  // smeared final time of the track
+    std::cout << "Initial position T before smearing" << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
 
     candidate->Position.SetT(tf_smeared * 1.0E3 * c_light); // apply smearing on final time of track
+    candidate->InitialPosition.SetT(ti_smeared * 1.0E3 * c_light); // apply smearing on inititial time of track
+
     candidate->ErrorT = timeResolution * 1.0E3 * c_light;
 
-    static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf_smeared * 1.0E3 * c_light);
-        std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';
+    //static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf_smeared * 1.0E3 * c_light);
+    std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';// initial position
 
-        std::cout << "Initial Time " << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
-        std::cout << "Position.SetT " << candidate->Position.T() << '\n';  // smeared final time of the track
+    std::cout << "Initial position T " << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
+    std::cout << "Position T " << candidate->Position.T() << '\n';  // smeared final time of the track
 
     std::cout << "Error T "<< candidate->ErrorT << '\n';
     candidate->AddCandidate(mother);
