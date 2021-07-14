@@ -489,7 +489,10 @@ if (ncharged==0) {
   for(Int_t i = 0; i < candidate->GetCandidates()->GetEntriesFast(); ++i)
   {
     constituent = static_cast<Candidate *>(candidate->GetCandidates()->At(i));
-    cout << constituent->PID << endl;
+    cout <<"PID "<< constituent->PID << endl;
+    cout <<"IsPU "<< constituent->IsPU << endl;
+    cout <<"PT "<< constituent->PT << endl;
+    cout <<"Eta "<< constituent->Position.Eta() << endl;
   }
 }
 
