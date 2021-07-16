@@ -29,6 +29,13 @@ double get_distance(Jet *jet1, Jet *jet2)
     return distance;
 }
 
+double get_distance(Vertex *vertex, Track *track)
+{
+    double distance;
+    distance = abs(vertex->Z - track->Z); // dz in mm
+    return distance;
+}
+
 Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double matching_radius)
 {
     Jet *matched_jet;
@@ -83,6 +90,26 @@ GenParticle* get_closest_particle(Jet* jet, std::vector<GenParticle*> genparts, 
     }// end loop over jets
     }
     return matched_particle;
+}
+
+// for track vertex Association
+Vertex* get_closest_vertex(Track* track, TClonesArray* branchVtx, double matching_radius)
+{
+    Vertex *matched_vertex;
+    Vertex *vertex;
+    double distance;
+    matched_vertex->Index = -1;
+    if(branchVtx->GetEntriesFast() > 0){
+      for (size_t k = 0; k < branchVtx->GetEntriesFast(); k++) { // loop over vertices
+          vertex = (Vertex*) branchVtx->At(k);
+          distance = get_distance(vertex, track);
+        if (distance < matching_radius) { // is the particle closer than the previous one?
+            matched_vertex = vertex;
+            matching_radius = distance; // new distance to matched vertex
+        }
+    }// end loop over vertices
+    }
+    return matched_vertex;
 }
 
 bool is_VBF(GenParticle *genparticle)
