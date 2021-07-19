@@ -518,7 +518,6 @@ module TrackSmearing TrackSmearing {
 
   # assume 30 ps resolution for now
   set TimeResolution 30E-12
-  #set TimeResolution 30
 
  }
 
@@ -993,7 +992,6 @@ module PdgCodeFilter NeutrinoFilterPU {
 #####################
 # MC truth jet finder
 #####################
-
 module FastJetFinder GenJetFinder {
   set InputArray NeutrinoFilter/filteredParticles
 
@@ -1077,6 +1075,7 @@ module FastJetGridMedianEstimator Rho {
 ##############
 
 module FastJetFinder FastJetFinder {
+
 #  set InputArray TowerMerger/towers
   set InputArray EFlowMergerCHS/eflow
 
@@ -1093,7 +1092,9 @@ module FastJetFinder FastJetFinder {
 }
 
 #module Class Name
+
 module FastJetFinder FastJetFinderAK8 {
+
 #  set InputArray TowerMerger/towers
   set InputArray EFlowMergerCHS/eflow
 
@@ -1153,6 +1154,7 @@ module JetPileUpSubtractor JetPileUpSubtractorAK8 {
 }
 
 module FastJetFinder FastJetFinderPUPPI {
+
 #  set InputArray TowerMerger/towers
   set InputArray RunPUPPI/PuppiParticles
 
@@ -1168,6 +1170,7 @@ module FastJetFinder FastJetFinderPUPPI {
 
 
 module FastJetFinder FastJetFinderPUPPIAK8 {
+
 #  set InputArray TowerMerger/towers
   set InputArray RunPUPPI/PuppiParticles
 
@@ -4163,21 +4166,26 @@ module TreeWriter TreeWriter {
 
 # add Branch InputArray BranchName BranchClass
   add Branch GenParticleFilter/filteredParticles Particle GenParticle
-  #add Branch Delphes/allParticles Particle GenParticle
+  #add Branch Delphes/allParticles allParticle GenParticle
+  add Branch PileUpMerger/vertices Vertex Vertex
+
   #store only PU genparticles
   #add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
+# input array to genjets
+  #add Branch NeutrinoFilter/filteredParticles Particle GenParticle
   #add Branch NeutrinoFilterPU/filteredParticlesPU PUParticle GenParticle
-  add Branch PileUpMerger/vertices Vertex Vertex
+
   add Branch TrackMerger/tracks Track Track
-  ##add Branch TrackSmearing/tracks TrackSmearing Track
+  #add Branch TrackSmearing/tracks TrackSmearing Track
   add Branch TimeSmearing/tracks TimeSmearing Track
 
   add Branch GenJetFinder/jets GenJet Jet
+  add Branch GenJetFinderAK8/jetsAK8 GenJetAK8 Jet
+  add Branch GenMissingET/momentum GenMissingET MissingET
+
   #add Branch GenJetFinder/constituents ConstituentsGenJet GenParticle
   add Branch GenJetFinderPU/jetsPU GenJetPU Jet
   #add Branch GenJetFinderPU/constituentsPU ConstituentsPU GenParticle
-  add Branch GenJetFinderAK8/jetsAK8 GenJetAK8 Jet
-  add Branch GenMissingET/momentum GenMissingET MissingET
 
    add Branch HCal/eflowTracks EFlowTrack Track
    add Branch ECal/eflowPhotons EFlowPhoton Tower

@@ -87,12 +87,13 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
 {
   TClonesArray *branchParticle = treeReader->UseBranch("Particle");
   TClonesArray *branchElectron = treeReader->UseBranch("Electron");
-  TClonesArray *branchPhoton = treeReader->UseBranch("PhotonLoose");
-  TClonesArray *branchMuon = treeReader->UseBranch("MuonLoose");
+  TClonesArray *branchPhoton = treeReader->UseBranch("Photon");
+  TClonesArray *branchMuon = treeReader->UseBranch("Muon");
    TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
    TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
    TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
   TClonesArray *branchJet = treeReader->UseBranch("Jet");
+  TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
 
   Long64_t allEntries = treeReader->GetEntries();
 
@@ -119,7 +120,7 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
   Int_t i, j, pdgCode;
 
   // Loop over all events
-  for(entry = 0; entry < 1; ++entry)
+  for(entry = 0; entry < allEntries; ++entry)
   {
 
     // Load selected branches with data from specified event
@@ -175,6 +176,8 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
        cout << " charged " << jet->NCharged << endl;
        cout << " neutral " << jet->NNeutrals << endl;
       // Loop over all jet's constituents
+      Int_t nTracks = 0;
+      Int_t nTower = 0;
       for(j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
       {
         object = jet->Constituents.At(j);
@@ -193,15 +196,57 @@ void AnalyseEvents(ExRootTreeReader *treeReader, TestPlots *plots)
           track = (Track*) object;
            cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
           momentum += track->P4();
+          ++nTracks;
         }
         else if(object->IsA() == Tower::Class())
         {
           tower = (Tower*) object;
            cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
           momentum += tower->P4();
+          ++nTower;
         }
       }
+      cout << "N Tracks " << nTracks << endl;
+      cout << "N Tower " << nTower << endl;
       plots->fJetDeltaPT->Fill((jet->PT - momentum.Pt())/jet->PT);
+    }
+
+    // Loop over all jets in event
+    for(i = 0; i < branchGenJet->GetEntriesFast(); ++i)
+    {
+      jet = (Jet*) branchGenJet->At(i);
+
+       cout<<"Looping over jet constituents. Jet pt: "<<jet->PT<<", eta: "<<jet->Eta<<", phi: "<<jet->Phi<<endl;
+       cout << "Constituents Size "<< jet->Constituents.GetEntriesFast() << endl;
+       cout << " charged " << jet->NCharged << endl;
+       cout << " neutral " << jet->NNeutrals << endl;
+      // Loop over all jet's constituents
+      Int_t nParts = 0;
+      for(j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
+      {
+        object = jet->Constituents.At(j);
+
+        // Check if the constituent is accessible
+        if(object == 0) continue;
+
+        if(object->IsA() == GenParticle::Class())
+        {
+          particle = (GenParticle*) object;
+           cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
+           ++nParts;
+        }
+        else if(object->IsA() == Track::Class())
+        {
+          track = (Track*) object;
+           cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
+        }
+        else if(object->IsA() == Tower::Class())
+        {
+          tower = (Tower*) object;
+           cout << "    Tower pt: " << tower->ET << ", eta: " << tower->Eta << ", phi: " << tower->Phi << endl;
+        }
+      }
+      cout << "N nParts " << nParts << endl;
     }
   }
 }

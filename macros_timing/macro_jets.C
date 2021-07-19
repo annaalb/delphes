@@ -534,7 +534,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     Int_t i;
     // Loop over all events
-    for(entry = 0; entry < 10; ++entry)
+    for(entry = 0; entry < 1; ++entry)
     {
       std::vector<GenParticle*> VBF_genparts;
       std::vector<GenParticle*> b_genparts;
@@ -590,6 +590,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     // --------Analyse jets -- 0 AK4 jets, 1 PUPPI,  2 GenJets ---------
     for (Int_t m = 0; m < 3; m++) {
+      cout <<"................................"<< branchJets[m]->GetName() << endl;
       if(branchJets[m]->GetEntriesFast() > 0)
       {
         Jet* jet;

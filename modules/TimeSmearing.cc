@@ -78,8 +78,6 @@ void TimeSmearing::Init()
 
   fItTrackInputArray = fTrackInputArray->MakeIterator();
 
-std::cout << "Init: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
-
   // create output array
   fOutputArray = ExportArray(GetString("OutputArray", "tracks"));
 }
@@ -88,8 +86,6 @@ std::cout << "Init: Track Array size: "<< fTrackInputArray->GetEntriesFast() << 
 
 void TimeSmearing::Finish()
 {
-  std::cout << "Finish: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
-
   if(fItTrackInputArray) delete fItTrackInputArray;
 }
 
@@ -97,8 +93,7 @@ void TimeSmearing::Finish()
 
 void TimeSmearing::Process()
 {
-  std::cout << "Process: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
-
+  //std::cout << "Process: Track Array size: "<< fTrackInputArray->GetEntriesFast() << '\n';
   Candidate *candidate, *mother;
   Double_t tf_smeared, tf;
   Double_t ti_smeared, ti;
@@ -107,11 +102,9 @@ void TimeSmearing::Process()
   Double_t timeResolution;
 
   const Double_t c_light = 2.99792458E8;
-std::cout << "Moin ---------------------------" << '\n';
   fItTrackInputArray->Reset();
   while((candidate = static_cast<Candidate *>(fItTrackInputArray->Next())))
   {
-    std::cout << "Set time smearing on candidate!" << '\n';
     const TLorentzVector &candidateInitialPosition = candidate->InitialPosition;
     const TLorentzVector &candidateFinalPosition = candidate->Position;
     const TLorentzVector &candidateMomentum = candidate->Momentum;
@@ -129,8 +122,8 @@ std::cout << "Moin ---------------------------" << '\n';
 
     mother = candidate;
     candidate = static_cast<Candidate *>(candidate->Clone());
-    std::cout << "Position.T before smearing " << candidate->Position.T() << '\n';  // smeared final time of the track
-    std::cout << "Initial position T before smearing" << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
+    //std::cout << "Position.T before smearing " << candidate->Position.T() << '\n';  // smeared final time of the track
+    //std::cout << "Initial position T before smearing" << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
 
     candidate->Position.SetT(tf_smeared * 1.0E3 * c_light); // apply smearing on final time of track
     candidate->InitialPosition.SetT(ti_smeared * 1.0E3 * c_light); // apply smearing on inititial time of track
@@ -138,12 +131,12 @@ std::cout << "Moin ---------------------------" << '\n';
     candidate->ErrorT = timeResolution * 1.0E3 * c_light;
 
     //static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.SetT(tf_smeared * 1.0E3 * c_light);
-    std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';// initial position
+    //std::cout << "GetCandidates()->at(0)->Position.SetT " << static_cast<Candidate *>(candidate->GetCandidates()->At(0))->Position.T() << '\n';// initial position
 
-    std::cout << "Initial position T " << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
-    std::cout << "Position T " << candidate->Position.T() << '\n';  // smeared final time of the track
+    //std::cout << "Initial position T " << candidate->InitialPosition.T() << '\n'; // inititial time of the track (vertex time?)
+    //std::cout << "Position T " << candidate->Position.T() << '\n';  // smeared final time of the track
+    //std::cout << "Error T "<< candidate->ErrorT << '\n';
 
-    std::cout << "Error T "<< candidate->ErrorT << '\n';
     candidate->AddCandidate(mother);
     fOutputArray->Add(candidate);
   }

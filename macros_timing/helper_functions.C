@@ -33,6 +33,9 @@ double get_distance(Vertex *vertex, Track *track)
 {
     double distance;
     distance = abs(vertex->Z - track->Z); // dz in mm
+    if (distance == 0) {
+        //cout << "Distance is 0! " << vertex->Z << " - "<< track->Z << endl;
+    }
     return distance;
 }
 
