@@ -490,7 +490,10 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     // TClonesArray *branchJetPUPPIConst = treeReader->UseBranch("ConstituentsJetPUPPI");
     // TClonesArray *branchGenJetConst = treeReader->UseBranch("ConstituentsGenJet");
 
-    TClonesArray *branchParticle = treeReader->UseBranch("Particle");
+    TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
+    TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
+    //TClonesArray *branchMergerParticle = treeReader->UseBranch("mergerSignalParticle"); // input to tracks
+
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
@@ -681,21 +684,20 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
               if(object->IsA() == GenParticle::Class())
               {
                 particle = (GenParticle*) object;
-                 cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
+                 //cout << "    GenPart pt: " << particle->PT << ", eta: " << particle->Eta << ", phi: " << particle->Phi << endl;
 
-                 cout << particle->PID << endl;
+                 //cout << particle->IsPU << endl;
               }
               else if(object->IsA() == Track::Class())
               {
                 track = (Track*) object;
                  cout << "    Track pt: " << track->PT << ", eta: " << track->Eta << ", phi: " << track->Phi << endl;
-                 // object2 = track->Particle;
-                 // if(object2 == 0) continue;
-                 // if(object2->IsA() == GenParticle::Class())
-                 // {
-                 //   particle = (GenParticle*) object2;
-                 //   cout << "Particle PID " <<particle->PID << endl;
-                 // }
+
+                 Track *t = static_cast<Track*>(track);
+                 GenParticle *p = static_cast<GenParticle*>(t->Particle.GetObject());
+                 cout << "Particle PID " <<p->PID << endl;
+                 cout << "Particle IsPU " <<p->IsPU << endl;
+
               }
               else if(object->IsA() == Tower::Class())
               {
