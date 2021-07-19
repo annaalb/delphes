@@ -957,7 +957,6 @@ module Merger ScalarHT {
 module PdgCodeFilter NeutrinoFilter {
 
   #set InputArray Delphes/stableParticles
-  ## use PU Particles
   set InputArray PileUpMerger/stableParticles
   set OutputArray filteredParticles
 
@@ -4165,15 +4164,19 @@ module StatusPidFilter GenParticleFilter {
 module TreeWriter TreeWriter {
 
 # add Branch InputArray BranchName BranchClass
+  # initially generated particles
+  add Branch Delphes/allParticles allParticle GenParticle
+  add Branch Delphes/stableParticles stableParticle GenParticle
+  # filtered generated particles
   add Branch GenParticleFilter/filteredParticles Particle GenParticle
-  #add Branch Delphes/allParticles allParticle GenParticle
-  add Branch PileUpMerger/vertices Vertex Vertex
+  # input array to tracks
+  add Branch PileUpMerger/stableParticles mergerSignalParticle GenParticle
+  add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
+  # input array to genjets
+  add Branch NeutrinoFilter/filteredParticles filteredParticle GenParticle
+  add Branch NeutrinoFilterPU/filteredParticlesPU filteredPUParticle GenParticle
 
-  #store only PU genparticles
-  #add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
-# input array to genjets
-  #add Branch NeutrinoFilter/filteredParticles Particle GenParticle
-  #add Branch NeutrinoFilterPU/filteredParticlesPU PUParticle GenParticle
+  add Branch PileUpMerger/vertices Vertex Vertex
 
   add Branch TrackMerger/tracks Track Track
   #add Branch TrackSmearing/tracks TrackSmearing Track
