@@ -23,6 +23,7 @@ R__LOAD_LIBRARY(libDelphes)
 
 struct MyPlots
 {
+  TH1* fgenparticleT;
   TH1* fvtxZ;
   // general track variables
   TH1* ftrackPT[2];
@@ -61,6 +62,10 @@ class ExRootTreeReader;
 
 void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 {
+  plots->fgenparticleT = result->AddHist1D(
+    "genparticle_T", "genparticle T",
+    "genparticle T [ns]", "number of genparticles", 100, -1, 1);
+
   plots->fvtxZ = result->AddHist1D(
     "vtx_z", "vertex Z",
     "vertex Z [m]", "number of vertices", 100, -0.25, 0.25);
@@ -146,11 +151,11 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     cout << "** Chain contains " << allEntries << " events" << endl;
 
-    TClonesArray *branchParticle = treeReader->UseBranch("Particle");
+    //TClonesArray *branchallParticle = treeReader->UseBranch("allParticle");
+    TClonesArray *branchParticle = treeReader->UseBranch("mergerSignalParticle");
     TClonesArray *branchTrack = treeReader->UseBranch("Track");
     TClonesArray *branchTrackSmeared = treeReader->UseBranch("TimeSmearing");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
-    //TClonesArray *branchallParticle = treeReader->UseBranch("allParticle");
 
     TClonesArray *branchTracks[2] = {branchTrack, branchTrackSmeared};
 
@@ -175,6 +180,16 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     {
       // Load selected branches with data from specified event
       treeReader->ReadEntry(entry);
+
+      // check particles
+      for (size_t v = 0; v < branchParticle->GetEntriesFast(); v++) {
+        genparticle = (GenParticle*) branchParticle->At(v);
+        //cout << genparticle->IsPU << endl;
+        // if (genparticle->IsPU == 0) {
+        //   cout << genparticle->PID << endl;
+        // }
+        plots->fgenparticleT->Fill(genparticle->T * 1000000000); // to have it in ns
+      }
 
       vtxT = 0;
       // get PV
@@ -225,55 +240,55 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
            // cout << p->PID << "\n";
             //cout << p->IsPU << "\n";
            // signal timediff
-           // if (p->IsPU == 0) {
-           //   ++ n_signal;
-           //   plots->fdeltaT[i][0][0]->Fill(deltaT );
-           //   plots->fdeltaZ[i][0][0]->Fill(deltaZ );
-           // }
-           // // PU timediff
-           // else if (p->IsPU == 1) {
-           //   ++ n_PU;
-           //   plots->fdeltaT[i][0][1]->Fill(deltaT );
-           //   plots->fdeltaZ[i][0][1]->Fill(deltaZ );
-           //  }
-           //  if (p->IsPU == 1 && abs(deltaT) < 0.03){
-           //    plots->fdeltaZ_PU_003[i]->Fill(deltaZ);
-           //  }
+           if (p->IsPU == 0) {
+             ++ n_signal;
+             plots->fdeltaT[i][0][0]->Fill(deltaT );
+             plots->fdeltaZ[i][0][0]->Fill(deltaZ );
+           }
+           // PU timediff
+           else if (p->IsPU == 1) {
+             ++ n_PU;
+             plots->fdeltaT[i][0][1]->Fill(deltaT );
+             plots->fdeltaZ[i][0][1]->Fill(deltaZ );
+            }
+            if (p->IsPU == 1 && abs(deltaT) < 0.03){
+              plots->fdeltaZ_PU_003[i]->Fill(deltaZ);
+            }
             // get closest vertex (matching radius 0.3 cm = 3mm)
             matched_vtx = get_closest_vertex(track, branchVtx, 3);
 
             if (matched_vtx->Index == 0) { // matched to PV
-              // if (p->IsPU == 0) {
-              //   ++ nMatchedPV_signal;
-              //   plots->fdeltaT[i][1][0]->Fill(deltaT );
-              //   plots->fdeltaZ[i][1][0]->Fill(deltaZ );
-              // }
-              // else if (p->IsPU == 1) {
-              //   ++nMatchedPV_PU;
-              //   plots->fdeltaT[i][1][1]->Fill(deltaT );
-              //   plots->fdeltaZ[i][1][1]->Fill(deltaZ );
-              //  }
+              if (p->IsPU == 0) {
+                ++ nMatchedPV_signal;
+                plots->fdeltaT[i][1][0]->Fill(deltaT );
+                plots->fdeltaZ[i][1][0]->Fill(deltaZ );
+              }
+              else if (p->IsPU == 1) {
+                ++nMatchedPV_PU;
+                plots->fdeltaT[i][1][1]->Fill(deltaT );
+                plots->fdeltaZ[i][1][1]->Fill(deltaZ );
+               }
             }
             else if (matched_vtx->Index > 0) { // matched to PU vertex
-              // if (p->IsPU == 0) {
-              //   ++ nMatchedSV_signal;
-              // }
-              // else if (p->IsPU == 1) {
-              //   ++nMatchedSV_PU;
-              //  }
+              if (p->IsPU == 0) {
+                ++ nMatchedSV_signal;
+              }
+              else if (p->IsPU == 1) {
+                ++nMatchedSV_PU;
+               }
             }
             else if (matched_vtx->Index == -1){ // not matched tracks
-              // if (p->IsPU == 0) {
-              //   ++ nNotMatched_signal;
-              //   plots->fdeltaT[i][2][0]->Fill(deltaT );
-              //   plots->fdeltaZ[i][2][0]->Fill(deltaZ );
-              //
-              // }
-              // else if (p->IsPU == 1) {
-              //   ++ nNotMatched_PU;
-              //   plots->fdeltaT[i][2][1]->Fill(deltaT );
-              //   plots->fdeltaZ[i][2][1]->Fill(deltaZ );
-              //  }
+              if (p->IsPU == 0) {
+                ++ nNotMatched_signal;
+                plots->fdeltaT[i][2][0]->Fill(deltaT );
+                plots->fdeltaZ[i][2][0]->Fill(deltaZ );
+
+              }
+              else if (p->IsPU == 1) {
+                ++ nNotMatched_PU;
+                plots->fdeltaT[i][2][1]->Fill(deltaT );
+                plots->fdeltaZ[i][2][1]->Fill(deltaZ );
+               }
             }
         } // end loop over tracks
         cout << "--------------------------------------------------" << endl;
