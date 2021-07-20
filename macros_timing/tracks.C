@@ -151,8 +151,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     cout << "** Chain contains " << allEntries << " events" << endl;
 
-    //TClonesArray *branchallParticle = treeReader->UseBranch("allParticle");
-    TClonesArray *branchParticle = treeReader->UseBranch("mergerSignalParticle");
+    TClonesArray *branchParticle = treeReader->UseBranch("mergerSignalParticle"); // particles are input array to tracks
     TClonesArray *branchTrack = treeReader->UseBranch("Track");
     TClonesArray *branchTrackSmeared = treeReader->UseBranch("TimeSmearing");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
@@ -174,6 +173,10 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     Double_t trackZ;
     Double_t vtxZ;
     Double_t deltaZ;
+
+    Double_t sum_eff=0;
+    Double_t sum_mis=0;
+    Double_t sum_purity=0;
 
     // Loop over all events
     for(entry = 0; entry < allEntries; ++entry)
@@ -203,7 +206,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       }
 
       // get tracks
-      for (size_t i = 0; i < 2; i++) {
+      for (size_t i = 1; i < 2; i++) {
         Int_t n_signal = 0;
         Int_t n_PU = 0;
         Int_t nMatchedPV_signal=0;
@@ -257,7 +260,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             // get closest vertex (matching radius 0.3 cm = 3mm)
             matched_vtx = get_closest_vertex(track, branchVtx, 3);
 
-            if (matched_vtx->Index == 0) { // matched to PV
+            if (abs(deltaZ) < 0.003) { // dz to PV < 0.3cm (0.003 m)
+              //if (matched_vtx->Index == 0) { // matched to PV
               if (p->IsPU == 0) {
                 ++ nMatchedPV_signal;
                 plots->fdeltaT[i][1][0]->Fill(deltaT );
@@ -307,9 +311,18 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
         cout << "misidentification rate " << mis << endl;
         cout << "Purity " << purity << endl;
 
-      } // end loop over time smeared / not smeared
+        sum_eff += eff;
+        sum_mis += mis;
+        sum_purity += purity;
+
+      } // end loop over time smeared
 
     }// end loop over entries
+    cout << "------------------------------------" << endl;
+    cout << "mean efficiency " << sum_eff/allEntries << endl;
+    cout << "mean misidentification rate " << sum_mis/allEntries << endl;
+    cout << "mean Purity "  << sum_purity/allEntries << endl;
+
   }//end void
 
   //------------------------------------------------------------------------------
