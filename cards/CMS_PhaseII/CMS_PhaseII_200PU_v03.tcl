@@ -11,7 +11,7 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 1
+set MaxEvents 10
 
 set ExecutionPath {
 
@@ -1019,7 +1019,7 @@ module FastJetFinder GenJetFinderPU {
   set AreaAlgorithm 4
   set ComputeRho 1
 
-  set JetPTMin 15.0
+  set JetPTMin 30.0
 }
 
 module FastJetFinder GenJetFinderAK8 {
