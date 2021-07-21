@@ -25,20 +25,18 @@ struct MyPlots
 {
   TH1 *fPUgenjetPT[6];
   TH1 *fPUgenjetRho;
-  TH1 *fPUgenjetETA;
-  TH1 *fPUgenjetNCharged;
-  TH1 *fPUgenjetNNeutrals;
+
+  TH1 *fPUgenjetETA[3];
+  TH1 *fPUgenjetNCharged[3];
+  TH1 *fPUgenjetNNeutrals[3];
 
   TH1 *fPUgenjetConstPT;
   TH1 *fPUgenjetConstETA;
 
-  TH1 *fPUgenjetCHPT;
-  TH1 *fPUgenjetCHEta;
-  TH1 *fPUgenjetCHT;
-  TH1 *fPUgenjetCHZ;
-  TH1 *fPUgenjetCHdT;
-  TH1 *fPUgenjetCHdZ;
-  TH1 *fPUgenjetCHPosT;
+  TH1 *fPUgenjetCHPT[3];
+  TH1 *fPUgenjetCHEta[3];
+  TH1 *fPUgenjetCHdT[3];
+  TH1 *fPUgenjetCHdZ[3];
 
   TH1 *fPUgenparticlePT;
   TH1 *fPUgenparticleETA;
@@ -86,16 +84,6 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       "PU_rho", "PU genjet #rho",
       " #rho [GeV]", "number of events", 50, 0.0, 200.0);
 
-  plots->fPUgenjetETA = result->AddHist1D(
-    "PU_genjet_eta", "PU genjet #eta",
-    "PU genjet #eta ", "number of genjets", 100, -10.0, 10.0);
-
-    plots->fPUgenjetNCharged = result->AddHist1D(
-      "PU_genjet_NCharged", "PU genjet NCharged",
-      "number of NCharged", "number of jets", 100, 0.0, 200.0);
-      plots->fPUgenjetNNeutrals = result->AddHist1D(
-        "PU_genjet_NNeutrals", "PU genjet NNeutrals",
-        "number of NNeutrals", "number of jets", 100, 0.0, 200.0);
     // genjets constituents
   plots->fPUgenjetConstPT = result->AddHist1D(
     "PU_genjet_constituents_pt", "PU genjet constituents P_{T}",
@@ -103,24 +91,34 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   plots->fPUgenjetConstETA = result->AddHist1D(
     "PU_genjet_constituents_eta", "PU constituents #eta",
     "PU genjet constituents #eta ", "number of constituents", 100, -5.0, 5.0);
-    // PU genjets Carged hadrons
-    plots->fPUgenjetCHPT = result->AddHist1D(
-      "PU_genjet_CH_pt", "PU genjet CH P_{T}",
-      "PU genjet CH P_{T}, GeV", "number of particles", 50, 0.0, 10.0);
-    plots->fPUgenjetCHEta = result->AddHist1D(
-      "PU_genjet_CH_eta", "PU CH #eta",
-      "PU genjet CH #eta ", "number of particles", 100, -5.0, 5.0);
 
-      plots->fPUgenjetCHdT = result->AddHist1D(
-        "PU_genjet_CH_dT", "CH T - PV T",
+
+    TString name[3] = {"", "_b_matched", "_VBF_matched"};
+    for (size_t i = 0; i < 3; i++) {
+      plots->fPUgenjetETA[i] = result->AddHist1D(
+        "PU_genjet"+name[i]+"_eta", "PU genjet #eta",
+        "PU genjet #eta ", "number of genjets", 100, -8.0, 8.0);
+        plots->fPUgenjetNCharged[i] = result->AddHist1D(
+          "PU_genjet"+name[i]+"_NCharged", "PU genjet NCharged",
+          "number of NCharged", "number of jets", 100, 0.0, 200.0);
+          plots->fPUgenjetNNeutrals[i] = result->AddHist1D(
+            "PU_genjet"+name[i]+"_NNeutrals", "PU genjet NNeutrals",
+            "number of NNeutrals", "number of jets", 100, 0.0, 200.0);
+      // PU genjets Charged hadrons
+      plots->fPUgenjetCHPT[i] = result->AddHist1D(
+        "PU_genjet"+name[i]+"_CH_pt", "PU genjet CH P_{T}",
+        "PU genjet CH P_{T}, GeV", "number of particles", 50, 0.0, 10.0);
+      plots->fPUgenjetCHEta[i] = result->AddHist1D(
+        "PU_genjet"+name[i]+"_CH_eta", "PU CH #eta",
+        "PU genjet CH #eta ", "number of particles", 100, -5.0, 5.0);
+      plots->fPUgenjetCHdT[i] = result->AddHist1D(
+        "PU_genjet"+name[i]+"_CH_dT", "CH T - PV T",
         "PU CH T - PV T [ns]", "number of particles", 100, -1, 1);
-      plots->fPUgenjetCHdZ = result->AddHist1D(
-        "PU_genjet_CH_dZ", "track Z - vtx Z",
+      plots->fPUgenjetCHdZ[i] = result->AddHist1D(
+        "PU_genjet"+name[i]+"_CH_dZ", "CH Z - PV Z",
         "PU CH Z - PV Z [m]", "number of particles", 100, -0.25, 0.25);
+    }
 
-      plots->fPUgenjetCHPosT = result->AddHist1D(
-        "PU_genjet_CH_Pos_dT", "CH T - PV T",
-        "PU CH Position.T - PV T [ns]", "number of particles", 100, -1, 1);
 
   plots->fbmatchedjetDeltaR = result->AddHist1D(
     "b_matched_PU_genjet_deltaR", "b matched jet #Delta R",
@@ -218,6 +216,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       {
         for (size_t k = 0; k < branchGenJetPU->GetEntriesFast(); k++) {
           genjet = (Jet*) branchGenJetPU->At(k);
+          if (genjet->PT > 30) {
           for (size_t l = 0; l < genjet->Constituents.GetEntriesFast(); l++) {
             object = genjet->Constituents.At(l);
             // Check if the constituent is accessible
@@ -230,34 +229,71 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
               // cout << "pt " << particle->PT << endl;
               // cout << "Charge " << particle->Charge << endl;
               if (particle->Charge != 0) {
-                plots->fPUgenjetCHPT->Fill(particle->PT);
-                plots->fPUgenjetCHEta->Fill(particle->Eta);
-                plots->fPUgenjetCHdT->Fill((particle->T  - Pvtx_T)* 1000000000);
-                plots->fPUgenjetCHdZ->Fill((particle->Z  - Pvtx_Z)/1000);
+                plots->fPUgenjetCHPT[0]->Fill(particle->PT);
+                plots->fPUgenjetCHEta[0]->Fill(particle->Eta);
+                plots->fPUgenjetCHdT[0]->Fill((particle->T  - Pvtx_T)* 1000000000);
+                plots->fPUgenjetCHdZ[0]->Fill((particle->Z  - Pvtx_Z)/1000);
               }
             }
           }
-          //if (genjet->PT > 20){
           for (size_t k = 0; k < 5; k++) {
             if(n_eta_min[k] < abs(genjet->Eta)&& abs(genjet->Eta)<=n_eta_max[k]){
               plots->fPUgenjetPT[k]->Fill(genjet->PT);
             }
           }
           plots->fPUgenjetPT[5]->Fill(genjet->PT);
-          plots->fPUgenjetETA->Fill(genjet->Eta);
-          plots->fPUgenjetNCharged->Fill(genjet->NCharged);
-          plots->fPUgenjetNNeutrals->Fill(genjet->NNeutrals);
-          //}
-          particle = get_closest_particle(genjet, genparts, 5);
+
+          plots->fPUgenjetETA[0]->Fill(genjet->Eta);
+          plots->fPUgenjetNCharged[0]->Fill(genjet->NCharged);
+          plots->fPUgenjetNNeutrals[0]->Fill(genjet->NNeutrals);
+          // match to b and VBF particles
+          particle = get_closest_particle(genjet, genparts, 0.4);
           if (is_b(particle)) {
               //put into list of b jets
               plots->fbmatchedjetDeltaR->Fill(get_distance(genjet, particle));
+              plots->fPUgenjetETA[1]->Fill(genjet->Eta);
+              plots->fPUgenjetNCharged[1]->Fill(genjet->NCharged);
+              plots->fPUgenjetNNeutrals[1]->Fill(genjet->NNeutrals);
+              for (size_t l = 0; l < genjet->Constituents.GetEntriesFast(); l++) {
+                object = genjet->Constituents.At(l);
+                // Check if the constituent is accessible
+                if(object == 0) continue;
+                if(object->IsA() == GenParticle::Class())
+                { particle = (GenParticle*) object;
+                  if (particle->Charge != 0) {
+                    plots->fPUgenjetCHPT[1]->Fill(particle->PT);
+                    plots->fPUgenjetCHEta[1]->Fill(particle->Eta);
+                    plots->fPUgenjetCHdT[1]->Fill((particle->T  - Pvtx_T)* 1000000000);
+                    plots->fPUgenjetCHdZ[1]->Fill((particle->Z  - Pvtx_Z)/1000);
+                  }
+                }
+              }
             }
           else if(is_VBF(particle)){
             // put into list of VBF jets
             plots->fVBFmatchedjetDeltaR->Fill(get_distance(genjet, particle));
+            plots->fPUgenjetETA[2]->Fill(genjet->Eta);
+            plots->fPUgenjetNCharged[2]->Fill(genjet->NCharged);
+            plots->fPUgenjetNNeutrals[2]->Fill(genjet->NNeutrals);
+            for (size_t l = 0; l < genjet->Constituents.GetEntriesFast(); l++) {
+              object = genjet->Constituents.At(l);
+              // Check if the constituent is accessible
+              if(object == 0) continue;
+              if(object->IsA() == GenParticle::Class())
+              { particle = (GenParticle*) object;
+                if (particle->Charge != 0) {
+                  plots->fPUgenjetCHPT[2]->Fill(particle->PT);
+                  plots->fPUgenjetCHEta[2]->Fill(particle->Eta);
+                  plots->fPUgenjetCHdT[2]->Fill((particle->T  - Pvtx_T)* 1000000000);
+                  plots->fPUgenjetCHdZ[2]->Fill((particle->Z  - Pvtx_Z)/1000);
+                }
+              }
+            }
           }
-        }
+
+          // TODO check vertices of PU genjets (real PU jets from one vertex?)
+        } // end pt cut 30 GeV
+        }// end PU genjets
       }
 
       //---------Analyse Rho-------
