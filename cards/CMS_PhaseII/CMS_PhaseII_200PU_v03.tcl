@@ -956,9 +956,10 @@ module Merger ScalarHT {
 #################
 
 module PdgCodeFilter NeutrinoFilter {
-
-  #set InputArray Delphes/stableParticles
-  set InputArray PileUpMerger/stableParticles
+  # pure signal sample
+  set InputArray Delphes/stableParticles
+  # signal and PU sample
+  #set InputArray PileUpMerger/stableParticles
   set OutputArray filteredParticles
 
   set PTMin 0.0
@@ -969,7 +970,6 @@ module PdgCodeFilter NeutrinoFilter {
   add PdgCode {-12}
   add PdgCode {-14}
   add PdgCode {-16}
-
 }
 
 module PdgCodeFilter NeutrinoFilterPU {
