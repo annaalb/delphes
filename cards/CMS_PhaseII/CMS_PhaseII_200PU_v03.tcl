@@ -4171,7 +4171,7 @@ module TreeWriter TreeWriter {
   # filtered generated particles
   add Branch GenParticleFilter/filteredParticles Particle GenParticle
   # input array to tracks
-  add Branch PileUpMerger/stableParticles mergerSignalParticle GenParticle
+  add Branch PileUpMerger/stableParticles mergerParticle GenParticle
 #  add Branch PileUpMerger/stableParticlesPU PUParticle GenParticle
   # input array to genjets
   add Branch NeutrinoFilter/filteredParticles filteredParticle GenParticle
