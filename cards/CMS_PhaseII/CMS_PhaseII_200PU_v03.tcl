@@ -11,7 +11,7 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 100
+set MaxEvents 10
 
 set ExecutionPath {
 
@@ -759,8 +759,13 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
   set VertexInputArray PileUpMerger/vertices
   # assume perfect pile-up subtraction for tracks with |z| > fZVertexResolution
   # Z vertex resolution in m
-  # from = 0.01 cm changed to 0.1 cm
-  set ZVertexResolution {0.001}
+  # set ZVertexResolution {0.0001}
+  set ZVertexResolution {
+
+     (pt < 10. ) * ( ( -0.8*log10(pt) + 1. ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 ) +
+     (pt >= 10. ) * ( ( 0.2 ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 )
+
+    }
 }
 
 ########################
@@ -4213,6 +4218,7 @@ module TreeWriter TreeWriter {
   #add Branch FastJetFinder/constituents ConstituentsJet GenParticle
   #add Branch FastJetFinderPUPPI/constituents ConstituentsJetPUPPI GenParticle
 
+  add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
   add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
   add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
 
