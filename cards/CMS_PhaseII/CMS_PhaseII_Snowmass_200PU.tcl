@@ -215,34 +215,6 @@ module Merger TrackMergerProp {
   set OutputArray tracks
 }
 
-########################################
-#   Smear tracks
-########################################
-
-module TrackSmearing TrackSmearing {
-  set InputArray TrackMerger/tracks
-  set BeamSpotInputArray BeamSpotFilter/beamSpotParticle
-  set OutputArray tracks
-  set ApplyToPileUp true
-
-  source ../trackResolutionCMS.tcl
-}
-
-########################################
-#   Time Smearing
-########################################
-
- module TimeSmearing TimeSmearing {
-  set InputArray TrackSmearing/tracks
-  #set InputArray TrackMerger/tracks
-  set OutputArray tracks
-
-  # assume 30 ps resolution for now
-  set TimeResolution 30E-12
-
- }
-
-
 ####################################
 # Track propagation to pseudo-pixel
 ####################################
@@ -535,6 +507,32 @@ module Merger TrackMerger {
   set OutputArray tracks
 }
 
+########################################
+#   Smear tracks
+########################################
+
+module TrackSmearing TrackSmearing {
+  set InputArray TrackMerger/tracks
+  set BeamSpotInputArray BeamSpotFilter/beamSpotParticle
+  set OutputArray tracks
+  set ApplyToPileUp true
+
+  source ../trackResolutionCMS.tcl
+}
+
+########################################
+#   Time Smearing
+########################################
+
+ module TimeSmearing TimeSmearing {
+  set InputArray TrackSmearing/tracks
+  #set InputArray TrackMerger/tracks
+  set OutputArray tracks
+
+  # assume 30 ps resolution for now
+  set TimeResolution 30E-12
+
+ }
 
 #############
 #   ECAL
