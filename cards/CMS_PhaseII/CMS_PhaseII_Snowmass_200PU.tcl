@@ -34,6 +34,8 @@ set ExecutionPath {
   MuonMomentumSmearing
 
   TrackMerger
+  TrackSmearing
+  TimeSmearing
 
   ECal
   HCal
@@ -58,6 +60,7 @@ set ExecutionPath {
   RunPUPPI
 
   EFlowFilterPuppi
+  EFlowFilterCHS
 
   GenParticleFilter
   PhotonFilter
@@ -98,11 +101,14 @@ set ExecutionPath {
   PuppiMissingET
   ScalarHT
 
+  FastJetFinderCHS
   FastJetFinderPUPPI
   FastJetFinderPUPPIAK8
 
+  JetScaleCHS
   JetScalePUPPI
   JetScalePUPPIAK8
+  JetSmearCHS
   JetSmearPUPPI
   JetSmearPUPPIAK8
 
@@ -208,6 +214,33 @@ module Merger TrackMergerProp {
   add InputArray ParticlePropagator/muons
   set OutputArray tracks
 }
+
+########################################
+#   Smear tracks
+########################################
+
+module TrackSmearing TrackSmearing {
+  set InputArray TrackMerger/tracks
+  set BeamSpotInputArray BeamSpotFilter/beamSpotParticle
+  set OutputArray tracks
+  set ApplyToPileUp true
+
+  source ../trackResolutionCMS.tcl
+}
+
+########################################
+#   Time Smearing
+########################################
+
+ module TimeSmearing TimeSmearing {
+  set InputArray TrackSmearing/tracks
+  #set InputArray TrackMerger/tracks
+  set OutputArray tracks
+
+  # assume 30 ps resolution for now
+  set TimeResolution 30E-12
+
+ }
 
 
 ####################################
