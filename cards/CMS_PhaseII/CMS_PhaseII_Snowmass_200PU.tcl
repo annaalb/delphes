@@ -102,6 +102,8 @@ set ExecutionPath {
   ScalarHT
 
   FastJetFinderCHS
+  JetPileUpSubtractor
+
   FastJetFinderPUPPI
   FastJetFinderPUPPIAK8
 
@@ -1073,6 +1075,19 @@ module FastJetFinder FastJetFinderCHS {
   set JetPTMin 15.0
 }
 
+###########################
+# Jet Pile-Up Subtraction
+###########################
+
+module JetPileUpSubtractor JetPileUpSubtractor {
+  set JetInputArray FastJetFinderCHS/jets
+  set RhoInputArray Rho/rho
+
+  set OutputArray jets
+
+  set JetPTMin 15.0
+}
+
 module FastJetFinder FastJetFinderPUPPI {
 #  set InputArray TowerMerger/towers
   set InputArray RunPUPPI/PuppiParticles
@@ -1122,8 +1137,8 @@ module FastJetFinder FastJetFinderPUPPIAK8 {
 ##################
 
 module EnergyScale JetScaleCHS {
-#  set InputArray JetPileUpSubtractor/jets
-  set InputArray FastJetFinderCHS/jets
+  set InputArray JetPileUpSubtractor/jets
+#  set InputArray FastJetFinderCHS/jets
   set OutputArray jets
 
  # scale formula for jets
@@ -7417,6 +7432,8 @@ module TreeWriter TreeWriter {
   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
+  add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
+  add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
 
   add Branch PhotonSmear/photons Photon Photon
   add Branch PhotonFakeMergerLoose/photons PhotonLoose Photon
