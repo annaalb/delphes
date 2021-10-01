@@ -1052,7 +1052,26 @@ module FastJetGridMedianEstimator Rho {
 
 }
 
+##############
+# Jet finder
+##############
 
+module FastJetFinder FastJetFinderCHS {
+
+#  set InputArray TowerMerger/towers
+  set InputArray EFlowMergerCHS/eflow
+
+  set OutputArray jets
+  set ConstituentsOutputArray constituents
+
+  set AreaAlgorithm 5
+
+  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
+  set JetAlgorithm 6
+  set ParameterR 0.4
+
+  set JetPTMin 15.0
+}
 
 module FastJetFinder FastJetFinderPUPPI {
 #  set InputArray TowerMerger/towers
@@ -1102,6 +1121,14 @@ module FastJetFinder FastJetFinderPUPPIAK8 {
 # Jet Energy Scale
 ##################
 
+module EnergyScale JetEnergyScaleCHS {
+#  set InputArray JetPileUpSubtractor/jets
+  set InputArray FastJetFinderCHS/jets
+  set OutputArray jets
+
+ # scale formula for jets
+  set ScaleFormula {1.00}
+}
 
 module EnergyScale JetScalePUPPI {
   set InputArray FastJetFinderPUPPI/jets
@@ -1167,6 +1194,15 @@ module EnergyScale JetScalePUPPIAK8 {
 # Jet Energy Smear #
 ####################
 
+module MomentumSmearing JetSmearCHS {
+  set InputArray JetScaleCHS/jets
+  set OutputArray jets
+  set UseMomentumVector true
+
+ ## DUMMY_JETPUPPIAK8_SMEAR
+  set ResolutionFormula {1.00e-10}
+ ## ENDDUMMY_JETPUPPIAK8_SMEAR
+}
 
 module MomentumSmearing JetSmearPUPPI {
   set InputArray JetScalePUPPI/jets
@@ -7397,6 +7433,7 @@ module TreeWriter TreeWriter {
   add Branch MuonFakeMergerMedium/muons MuonMedium Muon
   add Branch MuonFakeMergerTight/muons MuonTight Muon
 
+  add Branch JetSmearCHS/jets JetCHS Jet
   add Branch JetSmearPUPPI/jets JetPUPPI Jet
   add Branch JetSmearPUPPIAK8/jets JetPUPPIAK8 Jet
 
