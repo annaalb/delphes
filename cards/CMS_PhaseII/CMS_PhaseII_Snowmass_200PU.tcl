@@ -1121,7 +1121,7 @@ module FastJetFinder FastJetFinderPUPPIAK8 {
 # Jet Energy Scale
 ##################
 
-module EnergyScale JetEnergyScaleCHS {
+module EnergyScale JetScaleCHS {
 #  set InputArray JetPileUpSubtractor/jets
   set InputArray FastJetFinderCHS/jets
   set OutputArray jets
