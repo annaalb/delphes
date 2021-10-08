@@ -519,7 +519,7 @@ module TrackSmearing TrackSmearing {
   set OutputArray tracks
   set ApplyToPileUp true
 
-  source ../trackResolutionCMS.tcl
+  source resolution/trackResolutionCMSPhaseII.tcl
 }
 
 ########################################
@@ -542,7 +542,8 @@ module TrackSmearing TrackSmearing {
 
 module SimpleCalorimeter ECal {
   set ParticleInputArray ParticlePropagator/stableParticles
-  set TrackInputArray TrackMerger/tracks
+  #set TrackInputArray TrackMerger/tracks
+  set TrackInputArray TimeSmearing/tracks
 
   set TowerOutputArray ecalTowers
   set EFlowTrackOutputArray eflowTracks
@@ -774,12 +775,16 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
   # assume perfect pile-up subtraction for tracks with |z| > fZVertexResolution
   # Z vertex resolution in m (naive guess from tkLayout, assumed flat in pt for now)
 
-  set ZVertexResolution {
+  #set ZVertexResolution {
+#
+#     (pt < 10. ) * ( ( -0.8*log10(pt) + 1. ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 ) +
+#     (pt >= 10. ) * ( ( 0.2 ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 )
+#
+#     }
 
-     (pt < 10. ) * ( ( -0.8*log10(pt) + 1. ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 ) +
-     (pt >= 10. ) * ( ( 0.2 ) * (10^(0.5*abs(eta) + 1.5)) * 1e-06 )
+  # after track smearing is applied, assume fix dz cut
+  set ZVertexResolution { 0.0001}
 
-     }
  }
 
 ########################
@@ -803,7 +808,7 @@ module Merger TowerMerger {
 }
 
 ####################
-# Neutral eflow erger
+# Neutral eflow merger
 ####################
 
 module Merger NeutralEFlowMerger {
@@ -7430,6 +7435,12 @@ module TreeWriter TreeWriter {
   add Branch HCal/eflowTracks EFlowTrack Track
   add Branch ECal/eflowPhotons EFlowPhoton Tower
   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
+
+  add Branch TrackMerger/tracks Track Track
+  add Branch TimeSmearing/tracks TimeSmearedTrack Track
+  add Branch RecoPuFilter/eflowTracks RecoPuTrack Track
+
+  add Branch EFlowMergerCHS/eflow CHSeflow ParticleFlowCandidate
 
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
   add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
