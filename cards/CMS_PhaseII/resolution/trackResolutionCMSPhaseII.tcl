@@ -3,6 +3,7 @@ set CtgThetaResolutionFormula { 0.0 }
 set PhiResolutionFormula { 0.0 }
 set D0ResolutionFormula { 0.0 }
 # taken from https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT700/errorstracker.html
+# resolution given in mm
 set DZResolutionFormula {
  ( abs(eta) > 0.0 && abs(eta) <= 0.02  ) * ( pt > 0.0 && pt <= 8.0 ) * 0.0717 +\
  ( abs(eta) > 0.02 && abs(eta) <= 0.04  ) * ( pt > 0.0 && pt <= 8.0 ) * 0.0719 +\
