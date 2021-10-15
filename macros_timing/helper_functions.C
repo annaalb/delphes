@@ -41,7 +41,7 @@ double get_distance(Vertex *vertex, Track *track)
 
 Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double matching_radius)
 {
-    Jet *matched_jet;
+    Jet *matched_jet = nullptr;
     Jet *jet;
     double distance;
     if(branchJet->GetEntriesFast() > 0)
@@ -56,6 +56,27 @@ Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double match
     }// end loop over jets
     }
     return matched_jet;
+}
+
+Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius)
+{
+    Jet *matched_jet;
+    Jet *jet;
+    double distance;
+    Bool_t matched = false;
+    if(branchJet->GetEntriesFast() > 0)
+    {
+    for (size_t k = 0; k < branchJet->GetEntriesFast(); k++) { // loop over jets
+        jet = (Jet*) branchJet->At(k);
+        distance = get_distance(jet, jet_in);
+        if (distance < matching_radius) { // is the jet closer than the previous one?
+            matched_jet = jet;
+            matching_radius = distance; // new distance to matched jet
+            matched = true;
+        }
+    }// end loop over jets
+    }
+    return matched;
 }
 
 Jet* get_closest_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius)
@@ -109,6 +130,46 @@ Vertex* get_closest_vertex(Track* track, TClonesArray* branchVtx, double matchin
         if (distance < matching_radius) { // is the particle closer than the previous one?
             matched_vertex = vertex;
             matching_radius = distance; // new distance to matched vertex
+        }
+    }// end loop over vertices
+    }
+    return matched_vertex;
+}
+
+// for track vertex Association
+Vertex* get_closest_vertex(Track* track, TClonesArray* branchVtx, double matching_radius, Bool_t use_time, double dz_cut, double dzsig_cut, double dt_cut, double dtsig_cut)
+{
+    Vertex *matched_vertex;
+    Vertex *vertex;
+    double dz;
+    double dzsig;
+    double dt;
+    double dtsig;
+    double dist;
+
+    //matched_vertex = (Vertex*) branchVtx->At(0);
+    //matched_vertex->Index = -1; // TODO fix this
+
+    if(branchVtx->GetEntriesFast() > 0){
+      for (size_t k = 0; k < branchVtx->GetEntriesFast(); k++) { // loop over vertices
+          vertex = (Vertex*) branchVtx->At(k);
+          dz = get_distance(vertex, track);
+          dzsig = track->DZ / track->ErrorDZ; //TODO how do I access zerror? for now fixed to 0.01m (1cm)
+          dt = track->T - vertex->T;
+          dtsig = dt / track->ErrorT; // take t error on track time
+          if (use_time) {
+              dist = dzsig*dzsig + dtsig*dtsig;
+          }
+          else{
+              dist = dzsig*dzsig;
+          }
+          // cout << "dz by hand " << dz << " track-> DZ " << track->DZ << endl;
+          // cout << "dz error " << track->ErrorDZ << endl;
+          // cout << " dist = " << dist << endl;
+
+        if (dist < matching_radius && dz<dz_cut && dzsig < dzsig_cut && dt < dt_cut && dtsig < dtsig_cut) { //is the particle closer than the previous one and closer than the cuts?
+            matched_vertex = vertex;
+            matching_radius = dist; // new distance to matched vertex
         }
     }// end loop over vertices
     }

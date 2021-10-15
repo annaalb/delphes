@@ -124,26 +124,27 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
         {
           // Take track
           track = (Track*) branchPUPPITrack->At(k);
+          Track *t = static_cast<Track*>(branchPUPPITrack->At(k));
+          GenParticle *p = static_cast<GenParticle*>(t->Particle.GetObject());
 
-          plots->ftrackPT[0]->Fill(track->PT);
-          plots->ftrackEta[0]->Fill(track->Eta);
-          trackT = track->T;
-          trackZ = track->Z;
+          plots->ftrackPT[0]->Fill(t->PT);
+          plots->ftrackEta[0]->Fill(t->Eta);
+          trackT = t->T;
+          trackZ = t->Z;
 
            deltaT = (trackT - vtxT)* 1000000000;// to have it in ns
            deltaZ = (trackZ - vtxZ)/ 1000;// to have it in m
            // Get track and associated particle
-           Track *t = static_cast<Track*>(branchPUPPITrack->At(k));
-           GenParticle *p = static_cast<GenParticle*>(t->Particle.GetObject());
+
            // signal timediff
            if (p->IsPU == 0) {
              plots->fdeltaT[0][0]->Fill(deltaT );
-             plots->fdeltaZ[0][0]->Fill(deltaZ );
+             plots->fdeltaZ[0][0]->Fill(trackZ /1000 );
            }
            // PU timediff
            else if (p->IsPU == 1) {
              plots->fdeltaT[0][1]->Fill(deltaT );
-             plots->fdeltaZ[0][1]->Fill(deltaZ );
+             plots->fdeltaZ[0][1]->Fill(trackZ /1000 );
             }
 
         } // end loop over tracks
@@ -153,16 +154,16 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           // Take track
           ParticleFlowCandidate *t = static_cast<ParticleFlowCandidate*>(branchPUPPIParticle->At(k));
 
-          plots->ftrackPT[1]->Fill(track->PT);
-          plots->ftrackEta[1]->Fill(track->Eta);
+          plots->ftrackPT[1]->Fill(t->PT);
+          plots->ftrackEta[1]->Fill(t->Eta);
           trackT = t->T;
           trackZ = t->Z;
 
            deltaT = (trackT - vtxT)* 1000000000;// to have it in ns
            deltaZ = (trackZ - vtxZ)/ 1000;// to have it in m
 
-           plots->fdeltaT[0][1]->Fill(deltaT );
-           plots->fdeltaZ[0][1]->Fill(deltaZ );
+           plots->fdeltaT[1][1]->Fill(deltaT );
+           plots->fdeltaZ[1][1]->Fill(deltaZ );
 
         } // end loop over tracks
 

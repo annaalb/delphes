@@ -339,6 +339,10 @@ for (size_t i = 0; i < 3; i++) {
     TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
     TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
 
+    TClonesArray *branchParticleFlowCandidate = treeReader->UseBranch("ParticleFlowCandidate");
+    TClonesArray *branchPuppiTrack = treeReader->UseBranch("PuppiTrack");
+    TClonesArray *branchPuppiTower = treeReader->UseBranch("PuppiTower");
+
     TClonesArray *branchJets[3] = {branchJet, branchJetPUPPI, branchGenJet};
 
     Long64_t allEntries = treeReader->GetEntries();
@@ -442,7 +446,7 @@ for (size_t i = 0; i < 3; i++) {
            plots->fJetPT[m]->Fill(jet->PT);
            plots->fJetEta[m]->Fill(jet->Eta);
 
-          GenParticle* particle = get_closest_particle(jet, genparts, 1);
+          GenParticle* particle = get_closest_particle(jet, genparts, 0.4);
           if (is_b(particle)) {
               //put into list of b jets [1]
               plots->fmatchedjetDeltaR[m][1]->Fill(get_distance(jet, particle));
@@ -494,6 +498,7 @@ for (size_t i = 0; i < 3; i++) {
               {
                 track = (Track*) object;
                 GenParticle *p = static_cast<GenParticle*>(track->Particle.GetObject());
+              //  cout << "Track reference m "<< m << " , constituent j " << j << "   track pt "<< track->PT << endl;
 
                 plots->fVBFmatchedTrackPT[m][0]->Fill(track->PT);
                 plots->fVBFmatchedTrackEta[m][0]->Fill(track->Eta);
@@ -580,7 +585,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/macro_jets/");
+    gSystem->cd("Plots/macro_jets/2909");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

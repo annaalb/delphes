@@ -21,13 +21,13 @@ ptstrings = [ptstring1, ptstring2, ptstring3]
 nbins = hist1.GetNbinsX()
 
 f = open(tcl_file, 'w')
-f.write("set DZResolutionFormula {" + "\n")
+f.write("""set PResolutionFormula { 0.0 } """ + "\n"+ """set CtgThetaResolutionFormula { 0.0 } """ + "\n"+"""set PhiResolutionFormula { 0.0 } """ + "\n"+"""set D0ResolutionFormula { 0.0 } """ + "\n"+"""# taken from https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT700/errorstracker.html """ + "\n"+"""set DZResolutionFormula {""" + "\n")
 
 for i in range(len(ptstrings)):
     for k in range(nbins):
-        min = hists[i].GetBinLowEdge(k+1)
-        max = hists[i].GetBinLowEdge(k+1) + hist1.GetBinWidth(k+1)
-        res = hists[i].GetBinContent(k+1) / 1000
+        min = round((hists[i].GetBinLowEdge(k+1)), 4)
+        max = round((hists[i].GetBinLowEdge(k+1) + hist1.GetBinWidth(k+1)), 4)
+        res = round((hists[i].GetBinContent(k+1) / 1000), 4)
         f.write(""" ( abs(eta) > """ +str(min)+ " && abs(eta) <= "+ str(max) + ptstrings[i] + str(res) + " +\ " + "\n")
         pass
     pass

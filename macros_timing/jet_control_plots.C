@@ -54,11 +54,11 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
       for (size_t k = 0; k < 2; k++) {
         plots->fJetTrackT[i][k] = result->AddHist1D(
-          "track_T_"+branchJetNames[i]+name2[k], "track T",
-          "track T [ns]", "number of tracks", 100, -1, 1);
+          "track_dT_"+branchJetNames[i]+name2[k], "track T",
+          "track dT [ns]", "number of tracks", 100, -1, 1);
         plots->fJetTrackZ[i][k] = result->AddHist1D(
-          "track_z_"+branchJetNames[i]+name2[k], "track Z ",
-          "track Z[m]", "number of tracks", 100, -0.1, 0.1);
+          "track_dz_"+branchJetNames[i]+name2[k], "track Z ",
+          "track dZ[m]", "number of tracks", 100, -0.1, 0.1);
               }
 
   }
@@ -69,6 +69,16 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
   void AnalyseEvents(ExRootTreeReader *treeReader, MyPlots *plots)
   {
+    //TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
+    //TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
+    //TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
+    //TClonesArray *branchEFlowCHS = treeReader->UseBranch("CHSeflow");
+    TClonesArray *branchEFlowCHS2 = treeReader->UseBranch("ParticleFlowCandidateCHS");
+
+    TClonesArray *branchPuppiParticle = treeReader->UseBranch("ParticleFlowCandidate");
+    //TClonesArray *branchPuppiTrack = treeReader->UseBranch("PuppiTrack");
+    //TClonesArray *branchPuppiTower = treeReader->UseBranch("PuppiTower");
+
     TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
     TClonesArray *branchJetConstituentsCHS = treeReader->UseBranch("JetConstituentsCHS"); // jet constituents
@@ -76,14 +86,6 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
     TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
     TClonesArray *branchMergerParticle = treeReader->UseBranch("mergerParticle"); // input to tracks
-
-    TClonesArray *branchEFlowTrack = treeReader->UseBranch("EFlowTrack");
-    //TClonesArray *branchEFlowPhoton = treeReader->UseBranch("EFlowPhoton");
-    //TClonesArray *branchEFlowNeutralHadron = treeReader->UseBranch("EFlowNeutralHadron");
-
-    //TClonesArray *branchPuppiParticle = treeReader->UseBranch("ParticleFlowCandidate");
-    TClonesArray *branchPuppiTrack = treeReader->UseBranch("PuppiTrack");
-    //TClonesArray *branchPuppiTower = treeReader->UseBranch("PuppiTower");
 
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
@@ -98,6 +100,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     TObject* object;
     Track* track;
+    ParticleFlowCandidate* pf;
 
     Vertex* vtx;
     Double_t Pvtx_T, Pvtx_Z;
@@ -129,7 +132,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           Jet* jet;
           for (size_t k = 0; k < branchJets[m]->GetEntriesFast(); k++) {
             jet = (Jet*) branchJets[m]->At(k);
-            if(jet->PT>30){
+            //if(jet->PT>30){
              plots->fJetPT[m]->Fill(jet->PT);
              plots->fJetEta[m]->Fill(jet->Eta);
 
@@ -142,24 +145,26 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
                {
                  continue;
                }
-               if(object->IsA() == Track::Class())
+               if(object->IsA() == ParticleFlowCandidate::Class())
                {
-                 track = (Track*) object;
-                 if (track->Charge != 0) {
-                 GenParticle *p = static_cast<GenParticle*>(track->Particle.GetObject());
+                 pf = (ParticleFlowCandidate*) object;
+                 if (pf->Charge != 0) {
+                 GenParticle *p = static_cast<GenParticle*>(pf->Particles.At(0));
                  if (p->IsPU == 0) { // signal
-                   plots->fJetTrackT[m][0]->Fill((track->T) * 1000000000);
-                   plots->fJetTrackZ[m][0]->Fill((track->Z) / 1000);
+                   plots->fJetTrackT[m][0]->Fill((pf->T - Pvtx_T) * 1000000000);
+                   plots->fJetTrackZ[m][0]->Fill((pf->Z - Pvtx_Z) / 1000);
+                   //plots->fJetTrackZ[m][0]->Fill((pf->dZ) / 1000);
+
                   }
                   else if (p->IsPU == 1) { // PU tracks
-                    plots->fJetTrackT[m][1]->Fill((track->T) * 1000000000);
-                    plots->fJetTrackZ[m][1]->Fill((track->Z) / 1000);
+                    plots->fJetTrackT[m][1]->Fill((pf->T - Pvtx_T) * 1000000000);
+                    plots->fJetTrackZ[m][1]->Fill((pf->Z - Pvtx_Z) / 1000);
                   }
 
                   }
                 }
               } // end loop over constituents
-            }
+            //}
           }
         }
       } // loop over jet branches
@@ -195,7 +200,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/jet_control_plots/");
+    gSystem->cd("Plots/final/jet_control_plots/");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);
