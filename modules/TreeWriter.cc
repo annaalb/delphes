@@ -814,7 +814,7 @@ void TreeWriter::ProcessJets(ExRootTreeBranch *branch, TObjArray *array)
     entry->Constituents.Clear();
     ecalEnergy = 0.0;
     hcalEnergy = 0.0;
-    while((constituent = static_cast<Candidate *>(itConstituents.Next())))
+    while((constituent = static_cast<Candidate *>(itConstituents.Next()))) // add constituents to jet
     {
       entry->Constituents.Add(constituent);
       ecalEnergy += constituent->Eem;

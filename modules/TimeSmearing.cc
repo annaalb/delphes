@@ -74,7 +74,7 @@ void TimeSmearing::Init()
 
   // import track input array
   //fTrackInputArray = ImportArray(GetString("TrackInputArray", "MuonMomentumSmearing/muons"));
-  fTrackInputArray = ImportArray(GetString("TrackInputArray", "TrackMerger/tracks"));
+  fTrackInputArray = ImportArray(GetString("TrackInputArray", "TrackSmearing/tracks"));
 
   fItTrackInputArray = fTrackInputArray->MakeIterator();
 

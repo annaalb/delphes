@@ -77,9 +77,9 @@ void RunPUPPI::Init()
   fNeutralPtSlope.clear();
   for(int iMap = 0; iMap < param.GetSize(); ++iMap) fNeutralPtSlope.push_back(param[iMap].GetDouble());
   // read apply chs
-  //param = GetParam("ApplyCHS");
-  //fApplyCHS.clear();
-  //for(int iMap = 0; iMap < param.GetSize(); ++iMap) fApplyCHS.push_back(param[iMap].GetBool());
+//  param = GetParam("ApplyCHS");
+//  fApplyCHS.clear();
+//  for(int iMap = 0; iMap < param.GetSize(); ++iMap) fApplyCHS.push_back(param[iMap].GetBool());
   // read use charged
   param = GetParam("UseCharged");
   fUseCharged.clear();
@@ -274,10 +274,15 @@ void RunPUPPI::Process()
       candidate = static_cast<Candidate *>(InputParticles.at(it->user_index())->Clone());
       candidate->Momentum.SetPxPyPzE(it->px(), it->py(), it->pz(), it->e());
       fOutputArray->Add(candidate);
-      if(puppiInputVector.at(it->user_index()).id == 1 or puppiInputVector.at(it->user_index()).id == 2)
+      //cout << "Add PUPPI particle " << candidate->PT << endl;
+      if(puppiInputVector.at(it->user_index()).id == 1 or puppiInputVector.at(it->user_index()).id == 2){
         fOutputTrackArray->Add(candidate);
-      else if(puppiInputVector.at(it->user_index()).id == 0)
+        //cout << "Add PUPPI track " << candidate->PT << endl;
+      }
+      else if(puppiInputVector.at(it->user_index()).id == 0){
         fOutputNeutralArray->Add(candidate);
+        //cout << "Add PUPPI tower " << candidate->PT << endl;
+      }
     }
     else
     {

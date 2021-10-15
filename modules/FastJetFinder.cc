@@ -279,11 +279,11 @@ void FastJetFinder::Init()
 
   // import input array
 
-  fInputArray = ImportArray(GetString("InputArray", "Calorimeter/towers"));
+//  fInputArray = ImportArray(GetString("InputArray", "Calorimeter/tower"));
+  fInputArray = ImportArray(GetString("InputArray", "EFlowMergerCHS/eflow"));
   fItInputArray = fInputArray->MakeIterator();
 
   // create output arrays
-
   fOutputArray = ExportArray(GetString("OutputArray", "jets"));
   fRhoOutputArray = ExportArray(GetString("RhoOutputArray", "rho"));
   fConstituentsOutputArray = ExportArray(GetString("ConstituentsOutputArray", "constituents"));
@@ -315,8 +315,6 @@ void FastJetFinder::Finish()
 
 void FastJetFinder::Process()
 {
-  // std::cout << "---------------------------------"<< fInputArray->GetName() << '\n';
-  // std::cout << "---------------------------------"<< fOutputArray->GetName() << '\n';
   Candidate *candidate, *constituent;
   TLorentzVector momentum;
 
@@ -352,7 +350,6 @@ void FastJetFinder::Process()
     inputList.push_back(jet);
     ++number;
   }
-  //std::cout << "Number of input PseudoJets "<<number << '\n';
 
   // construct jets
   if(fAreaDefinition)
@@ -462,7 +459,6 @@ void FastJetFinder::Process()
       fConstituentsOutputArray->Add(constituent);
       candidate->AddCandidate(constituent);
     }
-    //std::cout << "Fastjet Finder: candidate lenght !" << candidate->GetCandidates()->GetEntriesFast() << '\n';
 
     candidate->Momentum = momentum;
     candidate->Position.SetT(time / timeWeight);
@@ -482,20 +478,6 @@ void FastJetFinder::Process()
     candidate->ExclYmerge34 = excl_ymerge34;
     candidate->ExclYmerge45 = excl_ymerge45;
     candidate->ExclYmerge56 = excl_ymerge56;
-// std::cout << "NCharged " << candidate->NCharged << ", NNeutrals "<<candidate->NNeutrals << '\n';
-//
-// if (ncharged==0) {
-//   std::cout << "Neutrals PID if ncharged = 0 "<< '\n';
-//   for(Int_t i = 0; i < candidate->GetCandidates()->GetEntriesFast(); ++i)
-//   {
-//     constituent = static_cast<Candidate *>(candidate->GetCandidates()->At(i));
-//     cout <<"PID "<< constituent->PID << endl;
-//     cout <<"IsPU "<< constituent->IsPU << endl;
-//     cout <<"PT "<< constituent->PT << endl;
-//     cout <<"Eta "<< constituent->Position.Eta() << endl;
-//   }
-// }
-
 
     //------------------------------------
     // Trimming
