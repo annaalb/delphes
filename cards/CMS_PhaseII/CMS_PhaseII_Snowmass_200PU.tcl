@@ -13,7 +13,7 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 10
+set MaxEvents 100
 
 set ExecutionPath {
 
@@ -50,7 +50,6 @@ set ExecutionPath {
   NeutralEFlowMerger
 
   EFlowMerger
-  EFlowMergerCHS
   Rho
 
   LeptonFilterNoLep
@@ -782,8 +781,8 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
 #
 #     }
 
-  # after track smearing is applied, assume fix dz cut
-  set ZVertexResolution { 0.0001}
+  # after track smearing is applied, assume fix dz cut (original: 0.0001 m ) given in m
+  set ZVertexResolution { 0.001}
 
  }
 
@@ -819,23 +818,12 @@ module Merger NeutralEFlowMerger {
 }
 
 #####################
-# Energy flow merger
+# Energy flow merger CHS
 #####################
 
 module Merger EFlowMerger {
 # add InputArray InputArray
-  add InputArray HCal/eflowTracks
-  add InputArray PhotonEnergySmearing/eflowPhotons
-  add InputArray HCal/eflowNeutralHadrons
-  set OutputArray eflow
-}
-
-############################
-# Energy flow merger no PU
-############################
-
-module Merger EFlowMergerCHS {
-# add InputArray InputArray
+  # add InputArray HCal/eflowTracks
   add InputArray RecoPuFilter/eflowTracks
   add InputArray PhotonEnergySmearing/eflowPhotons
   add InputArray HCal/eflowNeutralHadrons
@@ -927,7 +915,7 @@ module PdgCodeFilter EFlowFilterPuppi {
 ######################
 
 module PdgCodeFilter EFlowFilterCHS {
-  set InputArray EFlowMergerCHS/eflow
+  set InputArray EFlowMerger/eflow
   set OutputArray eflow
 
   add PdgCode {11}
@@ -1042,7 +1030,7 @@ module Merger GenMissingET {
 
 module FastJetGridMedianEstimator Rho {
 
-  set InputArray EFlowMergerCHS/eflow
+  set InputArray EFlowMerger/eflow
   set RhoOutputArray rho
 
   # add GridRange rapmin rapmax drap dphi
@@ -1066,7 +1054,7 @@ module FastJetGridMedianEstimator Rho {
 module FastJetFinder FastJetFinderCHS {
 
 #  set InputArray TowerMerger/towers
-  set InputArray EFlowMergerCHS/eflow
+  set InputArray EFlowMerger/eflow
 
   set OutputArray jets
   set ConstituentsOutputArray constituents
@@ -7437,12 +7425,12 @@ module TreeWriter TreeWriter {
   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch TrackMerger/tracks Track Track
-  add Branch TimeSmearing/tracks TimeSmearedTrack Track
+  add Branch TrackSmearing/tracks TimeSmearedTrack Track
   add Branch RecoPuFilter/eflowTracks RecoPuTrack Track
 
-  add Branch EFlowMergerCHS/eflow CHSeflow ParticleFlowCandidate
-
+  add Branch EFlowMerger/eflow ParticleFlowCandidateCHS ParticleFlowCandidate
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
+
   add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
   add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
 
@@ -7460,6 +7448,9 @@ module TreeWriter TreeWriter {
   add Branch MuonFakeMergerLoose/muons MuonLoose Muon
   add Branch MuonFakeMergerMedium/muons MuonMedium Muon
   add Branch MuonFakeMergerTight/muons MuonTight Muon
+
+  add Branch FastJetFinderCHS/constituents JetConstituentsCHS GenParticle
+  add Branch FastJetFinderCHS/jets FastJetCHS Jet
 
   add Branch JetSmearCHS/jets JetCHS Jet
   add Branch JetSmearPUPPI/jets JetPUPPI Jet
