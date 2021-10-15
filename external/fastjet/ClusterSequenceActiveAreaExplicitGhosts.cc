@@ -82,13 +82,13 @@ PseudoJet ClustSeqActAreaEG::area_4vector (const PseudoJet & jet) const {
 }
 
 //----------------------------------------------------------------------
-bool ClustSeqActAreaEG::is_pure_ghost(const PseudoJet & jet) const 
+bool ClustSeqActAreaEG::is_pure_ghost(const PseudoJet & jet) const
 {
   return _is_pure_ghost[jet.cluster_hist_index()];
 }
 
 //----------------------------------------------------------------------
-bool ClustSeqActAreaEG::is_pure_ghost(int hist_ix) const 
+bool ClustSeqActAreaEG::is_pure_ghost(int hist_ix) const
 {
   return hist_ix >= 0 ? _is_pure_ghost[hist_ix] : false;
 }
@@ -113,12 +113,11 @@ double ClustSeqActAreaEG::empty_area(const Selector & selector) const {
 //======================================================================
 // sort out the areas
 void ClustSeqActAreaEG::_post_process() {
-
   // first check for danger signals.
   // Establish largest ghost transverse momentum
   _max_ghost_perp2 = 0.0;
   for (int i = 0; i < _initial_n; i++) {
-    if (_is_pure_ghost[i] && _jets[i].perp2() > _max_ghost_perp2) 
+    if (_is_pure_ghost[i] && _jets[i].perp2() > _max_ghost_perp2)
       _max_ghost_perp2 = _jets[i].perp2();
   }
 
@@ -127,7 +126,7 @@ void ClustSeqActAreaEG::_post_process() {
   danger_ratio = danger_ratio * danger_ratio;
   _has_dangerous_particles = false;
   for (int i = 0; i < _initial_n; i++) {
-    if (!_is_pure_ghost[i] && 
+    if (!_is_pure_ghost[i] &&
         danger_ratio * _jets[i].perp2() <=  _max_ghost_perp2) {
       _has_dangerous_particles = true;
       break;
@@ -140,7 +139,7 @@ void ClustSeqActAreaEG::_post_process() {
   _areas.resize(_history.size());
   _area_4vectors.resize(_history.size());
   _is_pure_ghost.resize(_history.size());
-  
+
 //   copy(_jets.begin(), _jets.begin()+_initial_n, _area_4vectors.begin());
 //   for (int i = 0; i < _initial_n; i++) {
 //     if (_is_pure_ghost[i]) {
@@ -153,7 +152,7 @@ void ClustSeqActAreaEG::_post_process() {
 //       _area_4vectors[i].reset(0,0,0,0);
 //     }
 //   }
-  
+
   // First set up areas for the initial particles (ghost=_ghost_area,
   // real particles = 0); recall that _initial_n here is the number of
   // particles including ghosts
@@ -163,7 +162,7 @@ void ClustSeqActAreaEG::_post_process() {
       // normalise pt to be _ghost_area (NB we make use of fact that
       // for initial particles, jet and clust_hist index are the same).
       //_area_4vectors[i] = (_ghost_area/_jets[i].perp()) * _jets[i];
-      
+
       // NB: we use reset_momentum here, to ensure that the area 4
       // vectors do not acquire any structure (the structure would not
       // be meaningful for an area, and it messes up the use count (->
@@ -175,8 +174,8 @@ void ClustSeqActAreaEG::_post_process() {
       _area_4vectors[i] = PseudoJet(0.0,0.0,0.0,0.0);
     }
   }
-  
-  // next follow the branching through and set up the areas 
+
+  // next follow the branching through and set up the areas
   // and ghost-nature at each step of the clustering (rather than
   // each jet).
   for (unsigned i = _initial_n; i < _history.size(); i++) {
@@ -185,20 +184,19 @@ void ClustSeqActAreaEG::_post_process() {
       _areas[i]          = _areas[_history[i].parent1];
       _area_4vectors[i] = _area_4vectors[_history[i].parent1];
     } else {
-      _is_pure_ghost[i]  = _is_pure_ghost[_history[i].parent1] && 
+      _is_pure_ghost[i]  = _is_pure_ghost[_history[i].parent1] &&
 	                   _is_pure_ghost[_history[i].parent2]   ;
-      _areas[i]          = _areas[_history[i].parent1] + 
-	                   _areas[_history[i].parent2]  ;			   
-      _jet_def.recombiner()->recombine(_area_4vectors[_history[i].parent1], 
+      _areas[i]          = _areas[_history[i].parent1] +
+	                   _areas[_history[i].parent2]  ;
+      _jet_def.recombiner()->recombine(_area_4vectors[_history[i].parent1],
 	                   _area_4vectors[_history[i].parent2],
-			   _area_4vectors[i]);	
-//      _area_4vectors[i] = _area_4vectors[_history[i].parent1] + 
+			   _area_4vectors[i]);
+//      _area_4vectors[i] = _area_4vectors[_history[i].parent1] +
 //                          _area_4vectors[_history[i].parent2]  ;
     }
 
   }
-  
+
 }
 
 FASTJET_END_NAMESPACE
-
