@@ -13,7 +13,7 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 100
+set MaxEvents 10
 
 set ExecutionPath {
 
@@ -65,6 +65,7 @@ set ExecutionPath {
   PhotonFilter
 
   NeutrinoFilter
+  NeutrinoFilterPU
 
   PhotonIsolation
   PhotonScale
@@ -96,6 +97,7 @@ set ExecutionPath {
 
   GenJetFinder
   GenJetFinderAK8
+  GenJetFinderPU
 
   PuppiMissingET
   ScalarHT
@@ -159,6 +161,7 @@ module PileUpMerger PileUpMerger {
   set InputArray Delphes/stableParticles
 
   set ParticleOutputArray stableParticles
+  set PUParticleOutputArray stableParticlesPU
   set VertexOutputArray vertices
 
   # pre-generated minbias input file
@@ -984,6 +987,23 @@ module PdgCodeFilter NeutrinoFilter {
 
 }
 
+module PdgCodeFilter NeutrinoFilterPU {
+
+  ## use PU Particles
+  set InputArray PileUpMerger/stableParticlesPU
+  set OutputArray filteredParticlesPU
+
+  set PTMin 0.0
+
+  add PdgCode {12}
+  add PdgCode {14}
+  add PdgCode {16}
+  add PdgCode {-12}
+  add PdgCode {-14}
+  add PdgCode {-16}
+
+}
+
 #####################
 # MC truth jet finder
 #####################
@@ -998,6 +1018,23 @@ module FastJetFinder GenJetFinder {
   set ParameterR 0.4
 
   set JetPTMin 15.0
+}
+
+module FastJetFinder GenJetFinderPU {
+  set InputArray NeutrinoFilterPU/filteredParticlesPU
+
+  set OutputArray jetsPU
+  set RhoOutputArray Rho
+  set ConstituentsOutputArray constituentsPU
+
+  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
+  set JetAlgorithm 6
+  set ParameterR 0.4
+
+  set AreaAlgorithm 4
+  set ComputeRho 1
+
+  set JetPTMin 30.0
 }
 
 module FastJetFinder GenJetFinderAK8 {
@@ -7414,11 +7451,13 @@ module TreeWriter TreeWriter {
   add Branch GenParticleFilter/filteredParticles Particle GenParticle
   add Branch PileUpMerger/stableParticles mergerParticle GenParticle
   add Branch NeutrinoFilter/filteredParticles filteredParticle GenParticle
+  add Branch NeutrinoFilterPU/filteredParticlesPU filteredPUParticle GenParticle
   add Branch PileUpMerger/vertices Vertex Vertex
 
   add Branch GenJetFinder/jets GenJet Jet
   add Branch GenJetFinderAK8/jetsAK8 GenJetAK8 Jet
   add Branch GenMissingET/momentum GenMissingET MissingET
+  add Branch GenJetFinderPU/jetsPU GenJetPU Jet
 
   add Branch HCal/eflowTracks EFlowTrack Track
   add Branch ECal/eflowPhotons EFlowPhoton Tower
@@ -7449,8 +7488,8 @@ module TreeWriter TreeWriter {
   add Branch MuonFakeMergerMedium/muons MuonMedium Muon
   add Branch MuonFakeMergerTight/muons MuonTight Muon
 
-  add Branch FastJetFinderCHS/constituents JetConstituentsCHS GenParticle
-  add Branch FastJetFinderCHS/jets FastJetCHS Jet
+  # add Branch FastJetFinderCHS/constituents JetConstituentsCHS GenParticle
+  # add Branch FastJetFinderCHS/jets FastJetCHS Jet
 
   add Branch JetSmearCHS/jets JetCHS Jet
   add Branch JetSmearPUPPI/jets JetPUPPI Jet
