@@ -1,0 +1,212 @@
+Hello World Nr 1
+** INFO: adding module        PileUpMerger             PileUpMerger             
+** INFO: adding module        ParticlePropagator       ParticlePropagator       
+** INFO: adding module        Merger                   TrackMergerProp          
+** INFO: adding module        ParticlePropagator       DenseProp                
+** INFO: adding module        Merger                   DenseMergeTracks         
+** INFO: adding module        DenseTrackFilter         DenseTrackFilter         
+** INFO: adding module        Efficiency               ChargedHadronTrackingEfficiency
+** INFO: adding module        Efficiency               ElectronTrackingEfficiency
+** INFO: adding module        Efficiency               MuonTrackingEfficiency   
+** INFO: adding module        MomentumSmearing         ChargedHadronMomentumSmearing
+** INFO: adding module        EnergySmearing           ElectronEnergySmearing   
+** INFO: adding module        MomentumSmearing         MuonMomentumSmearing     
+** INFO: adding module        Merger                   TrackMerger              
+** INFO: adding module        TrackSmearing            TrackSmearing            
+** INFO: adding module        TimeSmearing             TimeSmearing             
+** INFO: adding module        SimpleCalorimeter        ECal                     
+** INFO: adding module        SimpleCalorimeter        HCal                     
+** INFO: adding module        EnergySmearing           PhotonEnergySmearing     
+** INFO: adding module        PdgCodeFilter            ElectronFilter           
+** INFO: adding module        TrackPileUpSubtractor    TrackPileUpSubtractor    
+** INFO: adding module        RecoPuFilter             RecoPuFilter             
+** INFO: adding module        Merger                   TowerMerger              
+** INFO: adding module        Merger                   NeutralEFlowMerger       
+** INFO: adding module        Merger                   EFlowMerger              
+** INFO: adding module        PdgCodeFilter            LeptonFilterNoLep        
+** INFO: adding module        PdgCodeFilter            LeptonFilterLep          
+** INFO: adding module        RunPUPPI                 RunPUPPIBase             
+** INFO: adding module        Merger                   RunPUPPIMerger           
+** INFO: adding module        RecoPuFilter             RunPUPPI                 
+** INFO: adding module        PdgCodeFilter            EFlowFilterPuppi         
+** INFO: adding module        PdgCodeFilter            EFlowFilterCHS           
+** INFO: adding module        Merger                   MissingET                
+** INFO: adding module        Merger                   PuppiMissingET           
+** INFO: adding module        Merger                   GenPileUpMissingET       
+** INFO: adding module        Merger                   ScalarHT                 
+** INFO: adding module        PdgCodeFilter            NeutrinoFilter           
+** INFO: adding module        PdgCodeFilter            NeutrinoFilterPU         
+** INFO: adding module        FastJetFinder            GenJetFinder             
+** INFO: adding module        FastJetFinder            GenJetFinderPU           
+** INFO: adding module        FastJetFinder            GenJetFinderAK8          
+** INFO: adding module        Merger                   GenMissingET             
+** INFO: adding module        FastJetGridMedianEstimatorRho                      
+** INFO: adding module        FastJetFinder            FastJetFinderCHS         
+** INFO: adding module        JetPileUpSubtractor      JetPileUpSubtractor      
+** INFO: adding module        FastJetFinder            FastJetFinderPUPPI       
+** INFO: adding module        FastJetFinder            FastJetFinderPUPPIAK8    
+** INFO: adding module        EnergyScale              JetScaleCHS              
+** INFO: adding module        EnergyScale              JetScalePUPPI            
+** INFO: adding module        EnergyScale              JetScalePUPPIAK8         
+** INFO: adding module        MomentumSmearing         JetSmearCHS              
+** INFO: adding module        MomentumSmearing         JetSmearPUPPI            
+** INFO: adding module        MomentumSmearing         JetSmearPUPPIAK8         
+** INFO: adding module        Efficiency               JetLooseID               
+** INFO: adding module        Efficiency               JetTightID               
+** INFO: adding module        PdgCodeFilter            PhotonFilter             
+** INFO: adding module        Isolation                PhotonIsolation          
+** INFO: adding module        EnergyScale              PhotonScale              
+** INFO: adding module        MomentumSmearing         PhotonSmear              
+** INFO: adding module        Efficiency               PhotonLooseID            
+** INFO: adding module        Efficiency               PhotonMediumID           
+** INFO: adding module        Efficiency               PhotonTightID            
+** INFO: adding module        Isolation                ElectronIsolation        
+** INFO: adding module        EnergyScale              ElectronScale            
+** INFO: adding module        MomentumSmearing         ElectronSmear            
+** INFO: adding module        Efficiency               ElectronLooseEfficiency  
+** INFO: adding module        Efficiency               ElectronMediumEfficiency 
+** INFO: adding module        Efficiency               ElectronTightEfficiency  
+** INFO: adding module        Isolation                MuonIsolation            
+** INFO: adding module        EnergyScale              MuonScale                
+** INFO: adding module        MomentumSmearing         MuonSmear                
+** INFO: adding module        Efficiency               MuonLooseIdEfficiency    
+** INFO: adding module        Efficiency               MuonMediumIdEfficiency   
+** INFO: adding module        Efficiency               MuonTightIdEfficiency    
+** INFO: adding module        JetFlavorAssociation     JetFlavorAssociationPUPPI
+** INFO: adding module        JetFlavorAssociation     JetFlavorAssociationPUPPIAK8
+** INFO: adding module        BTagging                 BTaggingPUPPILoose       
+** INFO: adding module        BTagging                 BTaggingPUPPIMedium      
+** INFO: adding module        BTagging                 BTaggingPUPPITight       
+** INFO: adding module        BTagging                 BTaggingPUPPIAK8Loose    
+** INFO: adding module        BTagging                 BTaggingPUPPIAK8Medium   
+** INFO: adding module        BTagging                 BTaggingPUPPIAK8Tight    
+** INFO: adding module        TauTagging               TauTaggingPUPPILoose     
+** INFO: adding module        TauTagging               TauTaggingPUPPIMedium    
+** INFO: adding module        TauTagging               TauTaggingPUPPITight     
+** INFO: adding module        JetFakeParticle          JetFakeMakerLoose        
+** INFO: adding module        JetFakeParticle          JetFakeMakerMedium       
+** INFO: adding module        JetFakeParticle          JetFakeMakerTight        
+** INFO: adding module        Merger                   PhotonFakeMergerLoose    
+** INFO: adding module        Merger                   PhotonFakeMergerMedium   
+** INFO: adding module        Merger                   PhotonFakeMergerTight    
+** INFO: adding module        Merger                   ElectronFakeMergerLoose  
+** INFO: adding module        Merger                   ElectronFakeMergerMedium 
+** INFO: adding module        Merger                   ElectronFakeMergerTight  
+** INFO: adding module        Merger                   MuonFakeMergerLoose      
+** INFO: adding module        Merger                   MuonFakeMergerMedium     
+** INFO: adding module        Merger                   MuonFakeMergerTight      
+** INFO: adding module        StatusPidFilter          GenParticleFilter        
+** INFO: adding module        TreeWriter               TreeWriter               
+** INFO: initializing module  Delphes                  
+** INFO: initializing module  PileUpMerger             
+** INFO: initializing module  ParticlePropagator       
+** INFO: initializing module  TrackMergerProp          
+** INFO: initializing module  DenseProp                
+** INFO: initializing module  DenseMergeTracks         
+** INFO: initializing module  DenseTrackFilter         
+** INFO: initializing module  ChargedHadronTrackingEfficiency
+** INFO: initializing module  ElectronTrackingEfficiency
+** INFO: initializing module  MuonTrackingEfficiency   
+** INFO: initializing module  ChargedHadronMomentumSmearing
+** INFO: initializing module  ElectronEnergySmearing   
+** INFO: initializing module  MuonMomentumSmearing     
+** INFO: initializing module  TrackMerger              
+** INFO: initializing module  TrackSmearing            
+** INFO: initializing module  TimeSmearing             
+** INFO: initializing module  ECal                     
+** INFO: initializing module  HCal                     
+** INFO: initializing module  PhotonEnergySmearing     
+** INFO: initializing module  ElectronFilter           
+** INFO: initializing module  TrackPileUpSubtractor    
+** INFO: initializing module  RecoPuFilter             
+** INFO: initializing module  TowerMerger              
+** INFO: initializing module  NeutralEFlowMerger       
+** INFO: initializing module  EFlowMerger              
+** INFO: initializing module  Rho                      
+** INFO: initializing module  LeptonFilterNoLep        
+** INFO: initializing module  LeptonFilterLep          
+** INFO: initializing module  RunPUPPIBase             
+** INFO: initializing module  RunPUPPIMerger           
+** INFO: initializing module  RunPUPPI                 
+** INFO: initializing module  EFlowFilterPuppi         
+** INFO: initializing module  EFlowFilterCHS           
+** INFO: initializing module  GenParticleFilter        
+** INFO: initializing module  PhotonFilter             
+** INFO: initializing module  NeutrinoFilter           
+** INFO: initializing module  NeutrinoFilterPU         
+** INFO: initializing module  PhotonIsolation          
+** INFO: initializing module  PhotonScale              
+** INFO: initializing module  PhotonSmear              
+** INFO: initializing module  PhotonLooseID            
+** INFO: initializing module  PhotonMediumID           
+** INFO: initializing module  PhotonTightID            
+** INFO: initializing module  ElectronIsolation        
+** INFO: initializing module  ElectronScale            
+** INFO: initializing module  ElectronSmear            
+** INFO: initializing module  ElectronLooseEfficiency  
+** INFO: initializing module  ElectronMediumEfficiency 
+** INFO: initializing module  ElectronTightEfficiency  
+** INFO: initializing module  MuonIsolation            
+** INFO: initializing module  MuonScale                
+** INFO: initializing module  MuonSmear                
+** INFO: initializing module  MuonLooseIdEfficiency    
+** INFO: initializing module  MuonMediumIdEfficiency   
+** INFO: initializing module  MuonTightIdEfficiency    
+** INFO: initializing module  GenMissingET             
+** INFO: initializing module  GenPileUpMissingET       
+** INFO: initializing module  GenJetFinder             
+#--------------------------------------------------------------------------
+#                         FastJet release 3.3.4
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the GNU GPL v2 or higher.  
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+** INFO: initializing module  GenJetFinderAK8          
+** INFO: initializing module  GenJetFinderPU           
+** INFO: initializing module  PuppiMissingET           
+** INFO: initializing module  ScalarHT                 
+** INFO: initializing module  FastJetFinderCHS         
+** INFO: initializing module  JetPileUpSubtractor      
+** INFO: initializing module  FastJetFinderPUPPI       
+** INFO: initializing module  FastJetFinderPUPPIAK8    
+** INFO: initializing module  JetScaleCHS              
+** INFO: initializing module  JetScalePUPPI            
+** INFO: initializing module  JetScalePUPPIAK8         
+** INFO: initializing module  JetSmearCHS              
+** INFO: initializing module  JetSmearPUPPI            
+** INFO: initializing module  JetSmearPUPPIAK8         
+** INFO: initializing module  JetFlavorAssociationPUPPI
+** INFO: initializing module  JetFlavorAssociationPUPPIAK8
+** INFO: initializing module  BTaggingPUPPILoose       
+** INFO: initializing module  BTaggingPUPPIMedium      
+** INFO: initializing module  BTaggingPUPPITight       
+** INFO: initializing module  BTaggingPUPPIAK8Loose    
+** INFO: initializing module  BTaggingPUPPIAK8Medium   
+** INFO: initializing module  BTaggingPUPPIAK8Tight    
+** INFO: initializing module  TauTaggingPUPPILoose     
+** INFO: initializing module  TauTaggingPUPPIMedium    
+** INFO: initializing module  TauTaggingPUPPITight     
+** INFO: initializing module  JetLooseID               
+** INFO: initializing module  JetTightID               
+** INFO: initializing module  JetFakeMakerLoose        
+** INFO: initializing module  JetFakeMakerMedium       
+** INFO: initializing module  JetFakeMakerTight        
+** INFO: initializing module  PhotonFakeMergerLoose    
+** INFO: initializing module  PhotonFakeMergerMedium   
+** INFO: initializing module  PhotonFakeMergerTight    
+** INFO: initializing module  ElectronFakeMergerLoose  
+** INFO: initializing module  ElectronFakeMergerMedium 
+** INFO: initializing module  ElectronFakeMergerTight  
+** INFO: initializing module  MuonFakeMergerLoose      
+** INFO: initializing module  MuonFakeMergerMedium     
+** INFO: initializing module  MuonFakeMergerTight      
+** INFO: initializing module  TreeWriter               
+** Reading MCFILES/VBF_HH_bbbb_10k.hepmc
+** Exiting...
