@@ -1,10 +1,34 @@
+#include <iostream>
+#include <TH1F.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TROOT.h>
+#include <TFile.h>
+#include <TLegend.h>
+#include <TArray.h>
+#include <TPad.h>
+#include <TGraph.h>
+#include <TGraphErrors.h>
+
+using namespace std;
+
+void SetStyle(){
+  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(0);
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
+  gStyle->SetFrameLineWidth(2);
+  gStyle->SetLegendBorderSize(0);
+}
+
 void SetupGlobalStyle()
 {
   // general appearance and style
 
   gROOT->SetStyle("Plain");
   //gStyle->SetOptStat(1100);
-  gStyle->SetOptStat(0);
+  //gStyle->SetOptStat(false);
   gStyle -> SetPadTickX(1);
   gStyle -> SetPadTickY(1);
 
@@ -48,6 +72,8 @@ void SetupGlobalStyle()
   gStyle->SetPadRightMargin(0.10);
   gStyle->SetPadBottomMargin(0.15);
   gStyle->SetPadLeftMargin(0.15);
+
+  gStyle->SetLegendBorderSize(0);
 
   gStyle->UseCurrentStyle();
 

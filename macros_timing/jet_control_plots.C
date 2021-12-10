@@ -81,7 +81,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
-    TClonesArray *branchJetConstituentsCHS = treeReader->UseBranch("JetConstituentsCHS"); // jet constituents
+  //  TClonesArray *branchJetConstituentsCHS = treeReader->UseBranch("JetConstituentsCHS"); // jet constituents
 
     TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
     TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
@@ -200,7 +200,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/final/jet_control_plots/");
+    gSystem->cd("PLOTS/10kevents/jet_control_plots/");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

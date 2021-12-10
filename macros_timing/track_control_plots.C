@@ -29,13 +29,12 @@ struct MyPlots
   TH1* ftrackPT[6];
   TH1* ftrackEta[6];
 
-  TH1* ftrackZ[6][2];
+  TH1* ftrackZ[6];
   TH1* ftrackT[6];
   TH1* ftrackTOuter[6];
 
-  TH1* fdeltaT[6][4][2];
-  TH1* fdeltaZ[6][4][2];
-  TH1* ftrackDZ[6];
+  TH1* fdeltaT[6][3];
+  TH1* fdeltaZ[6][3];
 
 };
 
@@ -48,6 +47,11 @@ class ExRootTreeReader;
 
 void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 {
+  THStack *stack_PU;
+  THStack *stack_signal;
+  TLegend *legend;
+  legend = result->AddLegend(0.25, 0.86, 0.45, 0.98);
+
   plots->fgenparticleT = result->AddHist1D(
     "genparticle_T", "genparticle T",
     "genparticle T [ns]", "number of genparticles", 100, -1, 1);
@@ -56,41 +60,35 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     "vtx_z", "vertex Z",
     "vertex Z [m]", "number of vertices", 100, -0.25, 0.25);
 
-  TString name[6] = {"eflowTrack", "RecoPUTrack", "", "smeared", "CHSeflow", "PUPPIeflow"};
-  TString IsPU[2] = {"_signal", "_PU"};
+  TString name[6] = {"eflowTrack", "RecoPUTrack", "track_merger", "smeared_track", "CHSeflow", "PUPPIeflow"};
+  TString IsPU[3] = {"_signal", "_PU", "_inclusive"};
 
   for (size_t i = 0; i < 6; i++) { // different track and eflow branches
   plots->ftrackPT[i] = result->AddHist1D(
-    "track_pt_"+name[i], "track pt",
+    "pt_"+name[i], "track pt",
     "track pt [GeV]", "number of tracks", 100, 0.0, 10.0);
   plots->ftrackEta[i] = result->AddHist1D(
-    "track_eta_"+name[i], "track eta",
+    "eta_"+name[i], "track eta",
     "track eta ", "number of tracks", 100, -5.0, 5.0);
 
-
-      plots->ftrackDZ[i] = result->AddHist1D(
-        "track_dz_"+name[i], "track dZ",
-        "track dZ [m]", "number of tracks", 100, -0.1, 0.1);
   plots->ftrackT[i] = result->AddHist1D(
-    "track_T_"+name[i], "track T",
+    "T_"+name[i], "track T",
     "track T [ns]", "number of tracks", 100, -1, 1);
     plots->ftrackTOuter[i] = result->AddHist1D(
-      "track_TOuter_"+name[i], "track TOuter",
+      "TOuter_"+name[i], "track TOuter",
       "track TOuter [ns]", "number of tracks", 100, 0.0, 30);
 
-Int_t j = 0;
-        for (size_t k = 0; k < 2; k++) { // signal or PU tracks
-      plots->fdeltaT[i][j][k] = result->AddHist1D(
-        "track_timediff_"+name[i]+IsPU[k], "track T - PV T",
+      plots->ftrackZ[i] = result->AddHist1D(
+        "z_"+name[i], "track Z",
+        "track Z [m]", "number of tracks", 100, -0.1, 0.1);
+
+        for (size_t k = 0; k < 3; k++) { // signal or PU tracks or inclusive
+      plots->fdeltaT[i][k] = result->AddHist1D(
+        "dt_"+name[i]+IsPU[k], "track T - PV T",
         "track T - PV T [ns]", "number of tracks", 100, -1, 1);
-      plots->fdeltaZ[i][j][k] = result->AddHist1D(
-        "track_zdiff_"+name[i]+IsPU[k], "track Z - vtx Z",
+      plots->fdeltaZ[i][k] = result->AddHist1D(
+        "dz_"+name[i]+IsPU[k], "track Z - vtx Z",
         "track Z - PV Z [m]", "number of tracks", 100, -0.1, 0.1);
-
-        plots->ftrackZ[i][k] = result->AddHist1D(
-          "track_z_"+name[i]+IsPU[k], "track Z",
-          "track Z [m]", "number of tracks", 100, -0.1, 0.1);
-
       }
 }
 
@@ -135,7 +133,7 @@ Int_t j = 0;
     Double_t deltaZ;
 
     // Loop over all events
-    for(entry = 0; entry < allEntries; ++entry)
+    for(entry = 0; entry < 10; ++entry)
     {
       // Load selected branches with data from specified event
       treeReader->ReadEntry(entry);
@@ -169,30 +167,30 @@ Int_t j = 0;
           plots->ftrackEta[i]->Fill(track->Eta);
           trackT = track->T;
           trackZ = track->Z;
-          //plots->ftrackZ[i]->Fill(trackZ / 1000); // in m
-          plots->ftrackDZ[i]->Fill(track->DZ / 1000); // in m
-
+          plots->ftrackZ[i]->Fill(trackZ / 1000); // in m
           plots->ftrackT[i]->Fill(trackT * 1000000000); // to have it in ns
           plots->ftrackTOuter[i]->Fill(track->TOuter * 1000000000); // to have it in ns
 
            deltaT = (trackT - vtxT)* 1000000000;// to have it in ns
            deltaZ = (trackZ - vtxZ)/ 1000;// to have it in m
+
+           plots->fdeltaT[i][2]->Fill(deltaT );
+           plots->fdeltaZ[i][2]->Fill(deltaZ );
            // Get track and associated particle
            Track *t = static_cast<Track*>(branch->At(k));
            GenParticle *p = static_cast<GenParticle*>(t->Particle.GetObject());
            // signal timediff
            if (p->IsPU == 0) {
-             plots->fdeltaT[i][0][0]->Fill(deltaT );
-             plots->fdeltaZ[i][0][0]->Fill(deltaZ );
-             plots->ftrackZ[i][0]->Fill(trackZ / 1000); // in m
-
+             plots->fdeltaT[i][0]->Fill(deltaT );
+             plots->fdeltaZ[i][0]->Fill(deltaZ );
+             //plots->ftrackZ[i][0]->Fill(trackZ / 1000); // in m
 
            }
            // PU timediff
            else if (p->IsPU == 1) {
-             plots->fdeltaT[i][0][1]->Fill(deltaT );
-             plots->fdeltaZ[i][0][1]->Fill(deltaZ );
-             plots->ftrackZ[i][1]->Fill(trackZ / 1000); // in m
+             plots->fdeltaT[i][1]->Fill(deltaT );
+             plots->fdeltaZ[i][1]->Fill(deltaZ );
+             //plots->ftrackZ[i][1]->Fill(trackZ / 1000); // in m
 
             }
 
@@ -213,23 +211,26 @@ Int_t j = 0;
           plots->ftrackEta[i]->Fill(t->Eta);
           trackT = t->T;
           trackZ = t->Z;
+          plots->ftrackZ[i]->Fill(trackZ / 1000); // in m
+          plots->ftrackT[i]->Fill(trackT * 1000000000); // to have it in ns
+          plots->ftrackTOuter[i]->Fill(track->TOuter * 1000000000); // to have it in ns
 
            deltaT = (trackT - vtxT)* 1000000000;// to have it in ns
            deltaZ = (trackZ - vtxZ)/ 1000;// to have it in m
 
-           // plots->fdeltaT[4][0][1]->Fill(deltaT );
-           // plots->fdeltaZ[4][0][1]->Fill(deltaZ );
+           plots->fdeltaT[i][2]->Fill(deltaT );
+           plots->fdeltaZ[i][2]->Fill(deltaZ );
 
            // signal timediff
            if (p->IsPU == 0) {
-             plots->fdeltaT[i][0][0]->Fill(deltaT );
-             plots->fdeltaZ[i][0][0]->Fill(deltaZ );
+             plots->fdeltaT[i][0]->Fill(deltaT );
+             plots->fdeltaZ[i][0]->Fill(deltaZ );
 
            }
            // PU timediff
            else if (p->IsPU == 1) {
-             plots->fdeltaT[i][0][1]->Fill(deltaT );
-             plots->fdeltaZ[i][0][1]->Fill(deltaZ );
+             plots->fdeltaT[i][1]->Fill(deltaT );
+             plots->fdeltaZ[i][1]->Fill(deltaZ );
             }
           }
         }
@@ -264,7 +265,7 @@ Int_t j = 0;
 
     SetupGlobalStyle();
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/final/track_control_plots/");
+    gSystem->cd("PLOTS/10kevents/track_control_plots/");
 
     PrintHistograms(result, plots);
 

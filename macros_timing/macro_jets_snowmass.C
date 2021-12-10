@@ -23,45 +23,46 @@ R__LOAD_LIBRARY(libDelphes)
 
 struct MyPlots
 {
-  TH1 *fJetPT[3];
-  TH1 *fJetEta[3];
+  TH1 *fJetPT[4];
+  TH1 *fJetEta[4];
 
   TH1 *fgenparticlePT[4];
   TH1 *fgenparticleEta[4];
 
   TH1 *fvtxZ;
 
-  // plots for all genjet collections (3) for VBF and b matched jets and not matched (+ PU jets) (4)
-  TH1 *fmatchedjetDeltaR[3][4];
-  TH1 *fmatchedjetPT[3][4];
-  TH1 *fmatchedjetEta[3][4];
-  TH1 *fmatchedjetDeltaEta[3][4];
-  TH1 *fmatchedjetDeltaPhi[3][4];
+  // plots for all genjet collections (3) for VBF and b matched jets and not matched (3)
+  TH1 *fmatchedjetDeltaR[4][4];
+  TH1 *fmatchedjetPT[4][4];
+  TH1 *fmatchedjetEta[4][4];
+  TH1 *fmatchedjetDeltaEta[4][4];
+  TH1 *fmatchedjetDeltaPhi[4][4];
 
-// jet time
-  TH1 *fmatchedjettime[3][4][4];
-  TH1 *fmatchedjetdt[3][4][4];
-  TH1 *fmatchedjettimeminusPV[3][4][4];
+// jet time ( jet branches, categories, eta bins)
+  TH1 *fmatchedjettime[4][4][4];
+  TH1 *fmatchedjetdt[4][4][4];
+  TH1 *fmatchedjettimeminusPV[4][4][4];
 
-  TH1 *fmatchedjetarrivaltime[3][4][4];
-  TH1 *fmatchedjetarrivaltimeminusPV[3][4][4];
+  TH1 *fmatchedjetarrivaltime[4][4][4];
+  TH1 *fmatchedjetarrivaltimeminusPV[4][4][4];
 
-  TH1 *fmatchedjetptweightedtime[3][4][4];
-  TH1 *fmatchedjetptweightedtimeminusPV[3][4][4];
+  TH1 *fmatchedjetptweightedtime[4][4][4];
+  TH1 *fmatchedjetptweightedtimeminusPV[4][4][4];
 
-  TH1 *fmatchedjetRweightedtime[3][4][4];
-  TH1 *fmatchedjetRweightedtimeminusPV[3][4][4];
+  TH1 *fmatchedjetRweightedtime[4][4][4];
+  TH1 *fmatchedjetRweightedtimeminusPV[4][4][4];
 
-  // jets -> tracks Plots
-  TH1 *fmatchedTrackPT[2][3][4];
-  TH1 *fmatchedTrackEta[2][3][4];
-  TH1 *fmatchedTrackdT[2][3][4];
-  TH1 *fmatchedTrackDZ[2][3][4];
-  TH1 *fmatchedTrackZ[2][3][4];
-  TH1 *fmatchedTrackTOuter[2][3][4];
-  TH1 *fmatchedTrackTOF[2][3][4];
+  // jets -> tracks Plots (jet branch (CHS and PUPPI, genjet), signal or PU, category)
+  TH1 *fmatchedTrackPT[4][3][4];
+  TH1 *fmatchedTrackEta[4][3][4];
+  // in eta bins
+  TH1 *fmatchedTrackdT[4][3][4][4];
+  TH1 *fmatchedTrackDZ[4][3][4][4];
+  TH1 *fmatchedTrackTOuter[4][3][4][4];
 
-  TH1 *fmatchedTrackPartT[2][3][3];
+  TH1 *fmatchedTrackZ[4][3][4];
+  TH1 *fmatchedTrackTOF[4][3][4];
+  TH1 *fmatchedTrackPartT[4][3][3];
 
   TH1 *fVBFmatchedGenPartPT[3];
   TH1 *fVBFmatchedGenPartEta[3];
@@ -73,8 +74,8 @@ struct MyPlots
   TH1 *fmatchedgenjetEta[3];
 
   // fake rate
-  TH1 *ffakerate[3];
-  TH1 *fPUtrackrate[3][3];
+  TH1 *ffakerate[4];
+  TH1 *fPUtrackrate[4][3];
 };
 
 //------------------------------------------------------------------------------
@@ -99,24 +100,6 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   THStack *stack_track_dz_PU[2];
   THStack *stack_track_dt_signal[2];
   THStack *stack_track_dt_PU[2];
-
-
-  // book more histograms
-  plots->fJetPT[0] = result->AddHist1D(
-    "jet_pt_all", "all jet P_{T}",
-    "jet P_{T}, GeV/c", "number of jets", 100, 0.0, 200.0);
-
-  plots->fJetEta[0] = result->AddHist1D(
-    "jet_eta_all", "all jet #eta",
-    "jet #eta", "number of jets", 100, -5.0, 5.0);
-
-  plots->fJetPT[1] = result->AddHist1D(
-    "jet_PUPPI_pt_all", "all PUPPI jet P_{T}",
-    "PUPPI jet P_{T}, GeV/c", "number of jets", 100, 0.0, 200.0);
-
-  plots->fJetEta[1] = result->AddHist1D(
-    "jet_PUPPI_eta_all", "all PUPPI jet #eta",
-    "PUPPI jet #eta", "number of jets", 100, -5.0, 5.0);
 
 // PV control plots
     plots->fvtxZ = result->AddHist1D(
@@ -144,13 +127,6 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     "genparticle_eta", "genparticle #eta",
     "genparticle #eta", "number of genparticles", 100, -5.0, 5.0);
 
-    // genjets
-  plots->fJetPT[2] = result->AddHist1D(
-    "genjet_pt", "genjet P_{T}",
-    "genjet P_{T}, GeV", "number of genjets", 50, 0.0, 200.0);
-  plots->fJetEta[2] = result->AddHist1D(
-    "genjet_eta", "genjet #eta",
-    "genjet #eta ", "number of genjets", 100, -5.0, 5.0);
   //-----------------------------------------------------------------
   //---------------VBF matched jets----------
   //------------------------------------------------------------------
@@ -160,6 +136,14 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   TString eta[4] = {"", "_eta02", "_eta23", "_eta34"};
 
   for (size_t m = 0; m < 3; m++) {
+    plots->fJetPT[m] = result->AddHist1D(
+      "jet_"+name[m]+"_pt_all", "all jet P_{T}",
+      " jet P_{T}, GeV/c", "number of jets", 100, 0.0, 200.0);
+
+    plots->fJetEta[m] = result->AddHist1D(
+      "jet_"+name[m]+"_eta_all", "all jet #eta",
+      " jet #eta", "number of jets", 100, -5.0, 5.0);
+
     plots->ffakerate[m] = result->AddHist1D(
       name[m]+"_fakerate", " fakerate ",
       " fake rate ", "number of events", 100, 0.0, 1.0);
@@ -245,35 +229,33 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     stack[4][b]->Add(plots->fmatchedjetDeltaEta[i][b]);
 
     // track timing Plots
-    if (i<2 ) { // skip for GenJets and b matched
+    //if (i<2 ) { // skip for GenJets and b matched
     for (size_t k = 0; k < 3; k++) { // split into signal and PU
       plots->fmatchedTrackPT[i][k][b] = result->AddHist1D(
         category[b]+"_"+name[i]+name2[k]+"_track_pt", category[b]+" matched track P_{T}",
         category[b]+" matched track P_{T}, GeV/c", "number of tracks", 100, 0.0, 10.0);
-        plots->fmatchedTrackEta[i][k][b] = result->AddHist1D(
-          category[b]+"_"+name[i]+name2[k]+"_track_eta", category[b]+" matched track #eta",
-          category[b]+" matched track #eta", "number of tracks", 100, -5.0, 5.0);
-      plots->fmatchedTrackdT[i][k][b] = result->AddHist1D(
-        category[b]+"_"+name[i]+name2[k]+"_track_T", category[b]+" matched track T",
+      plots->fmatchedTrackEta[i][k][b] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_eta", category[b]+" matched track #eta",
+        category[b]+" matched track #eta", "number of tracks", 100, -5.0, 5.0);
+      for (size_t e = 0; e < 4; e++) { // eta regions
+      plots->fmatchedTrackdT[i][k][b][e] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_T"+eta[e], category[b]+" matched track T",
         category[b]+" matched track dT [ns]", "number of tracks", 100, -1, 1);
-      //  plots->fmatchedTrackdT[i][k][b]->SetLineColor(b+1);
-          plots->fmatchedTrackDZ[i][k][b] = result->AddHist1D(
-            category[b]+"_"+name[i]+name2[k]+"_track_DZ", category[b]+" matched track DZ",
-            category[b]+" matched track dZ [m]", "number of tracks", 100, -0.01, 0.01);
-          //  plots->fmatchedTrackDZ[i][k][b]->SetLineColor(b+1);
-
-            plots->fmatchedTrackZ[i][k][b] = result->AddHist1D(
-              category[b]+"_"+name[i]+name2[k]+"_track_Z", category[b]+" matched track Z",
-              category[b]+" matched track Z [m]", "number of tracks", 100, -0.1, 0.1);
-
-        plots->fmatchedTrackTOuter[i][k][b] = result->AddHist1D(
-          category[b]+"_"+name[i]+name2[k]+"_track_TOuter", category[b]+" matched track TOuter",
-          category[b]+" matched track TOuter [ns]", "number of tracks", 100, 0.0, 25.0);
-        plots->fmatchedTrackTOF[i][k][b] = result->AddHist1D(
-          category[b]+"_"+name[i]+name2[k]+"_track_TOF", category[b]+" matched track TOF",
-          category[b]+" matched track TOF [ns]", "number of tracks", 100, 0.0, 25.0);
-        } // end signal or PU
-      }
+      plots->fmatchedTrackDZ[i][k][b][e] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_DZ"+eta[e], category[b]+" matched track DZ",
+        category[b]+" matched track dZ [m]", "number of tracks", 100, -0.01, 0.01);
+      plots->fmatchedTrackTOuter[i][k][b][e] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_TOuter"+eta[e], category[b]+" matched track TOuter",
+        category[b]+" matched track TOuter [ns]", "number of tracks", 100, 0.0, 25.0);
+      } // end eta regions
+      plots->fmatchedTrackZ[i][k][b] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_Z", category[b]+" matched track Z",
+        category[b]+" matched track Z [m]", "number of tracks", 100, -0.1, 0.1);
+      plots->fmatchedTrackTOF[i][k][b] = result->AddHist1D(
+        category[b]+"_"+name[i]+name2[k]+"_track_TOF", category[b]+" matched track TOF",
+        category[b]+" matched track TOF [ns]", "number of tracks", 100, 0.0, 25.0);
+      } // end signal or PU
+    //}
   } // end jet collections
 } // end VBF or b or not matched
 
@@ -337,13 +319,17 @@ for (size_t i = 0; i < 3; i++) {
 
     TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
     TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
+
     TClonesArray *branchMergerParticle = treeReader->UseBranch("mergerParticle"); // input to tracks
 
     TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
 
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
+
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
+
+    Int_t nbranches = 3;
 
     TClonesArray *branchJets[3] = {branchJetCHS, branchJetPUPPI, branchGenJet};
 
@@ -379,26 +365,27 @@ for (size_t i = 0; i < 3; i++) {
     Double_t matching_radius = 0.4;
     Double_t gen_matching_radius = 0.2;
 
-    Int_t n_jets[3][3];
+    Int_t n_jets[nbranches][3];
     Double_t fakerate;
 
-    Double_t t_jet[3][3], pt_t_jet[3][3], dt_jet[3][3], arrt_jet[3][3], darrt_jet[3][3], pt_sum[3][3];
-    Double_t R, R_sum[3][3], R_t_jet[3][3];
-    Int_t n_tracks[3][3], n_signal_tracks[3][3], n_PU_tracks[3][3];
-    Double_t mistag_rate[3][3];
+    Double_t t_jet[nbranches][3], pt_t_jet[nbranches][3], dt_jet[nbranches][3], arrt_jet[nbranches][3], darrt_jet[nbranches][3], pt_sum[nbranches][3];
+    Double_t R, R_sum[nbranches][3], R_t_jet[nbranches][3];
+    Int_t n_tracks[nbranches][3], n_signal_tracks[nbranches][3], n_PU_tracks[nbranches][3];
+    Double_t mistag_rate[nbranches][3];
 
     Long64_t entry;
 
     Int_t i;
 
     // TODO write a module that stores these jets in a tree
-    std::vector<Jet*> matched_jets[3][3];
+    std::vector<Jet*> matched_jets[nbranches][3]; // 4 branches and 3 categories
 
     Bool_t debug=false;
 
     // Loop over all events
-    for(entry = 0; entry < 10; ++entry)
+    for(entry = 0; entry < allEntries; ++entry)
     {
+      cout << "Process event " << entry+1 << " of total " << allEntries << endl;
       if(debug){cout << "-------- begin event ---------"<< endl;}
       std::vector<GenParticle*> VBF_genparts;
       std::vector<GenParticle*> b_genparts;
@@ -448,7 +435,7 @@ for (size_t i = 0; i < 3; i++) {
       }
       if(debug){cout << "-------- begin analyse jets -> put them into categories ---------"<< endl;}
     // --------Analyse jets -- 0 CHS, 1 PUPPI,  2 GenJets ---------
-    for (Int_t m = 0; m < 3; m++) {
+    for (Int_t m = 0; m < nbranches; m++) {
       // get jets
       if(branchJets[m]->GetEntriesFast() > 0)
       {
@@ -528,7 +515,7 @@ for (size_t i = 0; i < 3; i++) {
     if(debug){cout << "-------- begin analyse jets -> fill plots ---------"<< endl;}
     // Fill hists for all three jet branches in all categories
     for (size_t k = 0; k < 3; k++) { // for each category
-      for (size_t m = 0; m < 2; m++) { // CHS, PUPPI (not for genjets)
+      for (size_t m = 0; m < nbranches; m++) { // CHS, PUPPI, genjets
         for (size_t i = 0; i < matched_jets[m][k].size(); i++) {
 
         Jet* jet = matched_jets[m][k].at(i);
@@ -551,14 +538,67 @@ for (size_t i = 0; i < 3; i++) {
         arrt_jet[m][k] = 0;
         darrt_jet[m][k] = 0;
         // Loop over all jet's constituents
+        if(debug){cout << "-------- fill plots: loop over jet constituents ---------"<< endl;}
+
         for(size_t j = 0; j < jet->Constituents.GetEntriesFast(); ++j)
         {
           object = jet->Constituents.At(j);
           // Check if the constituent is accessible
           if(object == 0){continue;}
-          // pf candidates
+          // --------particle candidates (GenJets)----------------
+          else if(object->IsA() == GenParticle::Class())
+          {
+            if(debug){cout << "-------- fill plots: jet constituent is genparticle ---------"<< endl;}
+            particle = (GenParticle*) object;
+            deltaT = (particle->T - Pvtx_T) * 1000000000;
+            deltaZ = (particle->Z - Pvtx_Z) / 1000;
+            if (particle->Charge != 0) { // charged particles
+              if(debug){cout << "-------- charged genparticle ---------"<< endl;}
+              plots->fmatchedTrackPT[m][0][k]->Fill(particle->PT);
+              plots->fmatchedTrackEta[m][0][k]->Fill(particle->Eta);
+              plots->fmatchedTrackZ[m][0][k]->Fill((particle->Z) / 1000);
+              // in eta bins (first inclusive)
+              plots->fmatchedTrackdT[m][0][k][0]->Fill(deltaT);
+              plots->fmatchedTrackDZ[m][0][k][0]->Fill(deltaZ);
+              if (2 > abs(jet->Eta) ) {
+                plots->fmatchedTrackdT[m][0][k][1]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][1]->Fill(deltaZ);
+              }
+              if (2 < abs(jet->Eta) && abs(jet->Eta) < 3) {
+                plots->fmatchedTrackdT[m][0][k][2]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][2]->Fill(deltaZ);
+              }
+              if (3 < abs(jet->Eta) && abs(jet->Eta) < 4) {
+                plots->fmatchedTrackdT[m][0][k][3]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][3]->Fill(deltaZ);
+              }
+
+              if (particle->IsPU == 0) { // signal genjets
+                ++n_signal_tracks[m][k];
+                if(debug) {cout << "--- process Signal genjets ---" << endl;};
+              }
+              else if (particle->IsPU == 1) { // PU genjets
+                ++n_PU_tracks[m][k];
+                if(debug) {cout << "--- process PU genjets ---" << endl;};
+              }
+              // for the jet time
+              t_jet[m][k] += (particle->T ); // mean jet time
+              pt_t_jet[m][k] += (particle->T * particle->PT); // pt weighted time
+              pt_sum[m][k] += (particle->PT); // summed pt of tracks
+              R = get_distance(jet, particle);
+              R_sum[m][k] += R;
+              R_t_jet[m][k] += (particle->T * R); // dr weighted time
+
+              dt_jet[m][k] += (particle->T - Pvtx_T);
+
+              ++n_tracks[m][k];
+            } // end charged pf
+          } // --------END particle candidates----------------
+          // --------pf candidates----------------
           else if(object->IsA() == ParticleFlowCandidate::Class())
           {
+            if(debug){cout << "-------- fill plots: jet constituent is pf candidate ---------"<< endl;}
+
             pf = (ParticleFlowCandidate*) object;
             deltaT = (pf->T - Pvtx_T) * 1000000000;
             deltaZ = (pf->Z - Pvtx_Z) / 1000;
@@ -568,31 +608,82 @@ for (size_t i = 0; i < 3; i++) {
               GenParticle *p = static_cast<GenParticle*>(pf->Particles.At(0));
               plots->fmatchedTrackPT[m][0][k]->Fill(pf->PT);
               plots->fmatchedTrackEta[m][0][k]->Fill(pf->Eta);
-              plots->fmatchedTrackdT[m][0][k]->Fill(deltaT);
-              plots->fmatchedTrackDZ[m][0][k]->Fill(deltaZ);
               plots->fmatchedTrackZ[m][0][k]->Fill((pf->Z) / 1000);
-              plots->fmatchedTrackTOuter[m][0][k]->Fill(TOuter);
               plots->fmatchedTrackTOF[m][0][k]->Fill(TOF);
+
+              // in eta bins (first inclusive)
+              plots->fmatchedTrackdT[m][0][k][0]->Fill(deltaT);
+              plots->fmatchedTrackDZ[m][0][k][0]->Fill(deltaZ);
+              plots->fmatchedTrackTOuter[m][0][k][0]->Fill(TOuter);
+              if (2 > abs(jet->Eta) ) {
+                plots->fmatchedTrackdT[m][0][k][1]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][1]->Fill(deltaZ);
+                plots->fmatchedTrackTOuter[m][0][k][1]->Fill(TOuter);
+              }
+              if (2 < abs(jet->Eta) && abs(jet->Eta) < 3) {
+                plots->fmatchedTrackdT[m][0][k][2]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][2]->Fill(deltaZ);
+                plots->fmatchedTrackTOuter[m][0][k][2]->Fill(TOuter);
+              }
+              if (3 < abs(jet->Eta) && abs(jet->Eta) < 4) {
+                plots->fmatchedTrackdT[m][0][k][3]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][0][k][3]->Fill(deltaZ);
+                plots->fmatchedTrackTOuter[m][0][k][3]->Fill(TOuter);
+              }
 
               if (p->IsPU == 0) { // signal tracks
                 ++n_signal_tracks[m][k];
                 plots->fmatchedTrackPT[m][1][k]->Fill(pf->PT);
                 plots->fmatchedTrackEta[m][1][k]->Fill(pf->Eta);
-                plots->fmatchedTrackdT[m][1][k]->Fill(deltaT);
-                plots->fmatchedTrackDZ[m][1][k]->Fill(deltaZ);
                 plots->fmatchedTrackZ[m][1][k]->Fill((pf->Z) / 1000);
-                plots->fmatchedTrackTOuter[m][1][k]->Fill(TOuter);
                 plots->fmatchedTrackTOF[m][1][k]->Fill(TOF);
+
+                // in eta bins (first inclusive)
+                plots->fmatchedTrackdT[m][1][k][0]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][1][k][0]->Fill(deltaZ);
+                plots->fmatchedTrackTOuter[m][1][k][0]->Fill(TOuter);
+                if (2 > abs(jet->Eta) ) {
+                  plots->fmatchedTrackdT[m][1][k][1]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][1][k][1]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][1][k][1]->Fill(TOuter);
+                }
+                if (2 < abs(jet->Eta) && abs(jet->Eta) < 3) {
+                  plots->fmatchedTrackdT[m][1][k][2]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][1][k][2]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][1][k][2]->Fill(TOuter);
+                }
+                if (3 < abs(jet->Eta) && abs(jet->Eta) < 4) {
+                  plots->fmatchedTrackdT[m][1][k][3]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][1][k][3]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][1][k][3]->Fill(TOuter);
+                }
               }
               else if (p->IsPU == 1) { // PU tracks
                 ++n_PU_tracks[m][k];
                 plots->fmatchedTrackPT[m][2][k]->Fill(pf->PT);
                 plots->fmatchedTrackEta[m][2][k]->Fill(pf->Eta);
-                plots->fmatchedTrackdT[m][2][k]->Fill(deltaT);
-                plots->fmatchedTrackDZ[m][2][k]->Fill(deltaZ);
                 plots->fmatchedTrackZ[m][2][k]->Fill((pf->Z) / 1000);
-                plots->fmatchedTrackTOuter[m][2][k]->Fill(TOuter);
                 plots->fmatchedTrackTOF[m][2][k]->Fill(TOF);
+
+                // in eta bins (first inclusive)
+                plots->fmatchedTrackdT[m][2][k][0]->Fill(deltaT);
+                plots->fmatchedTrackDZ[m][2][k][0]->Fill(deltaZ);
+                plots->fmatchedTrackTOuter[m][2][k][0]->Fill(TOuter);
+                if (2 > abs(jet->Eta) ) {
+                  plots->fmatchedTrackdT[m][2][k][1]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][2][k][1]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][2][k][1]->Fill(TOuter);
+                }
+                if (2 < abs(jet->Eta) && abs(jet->Eta) < 3) {
+                  plots->fmatchedTrackdT[m][2][k][2]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][2][k][2]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][2][k][2]->Fill(TOuter);
+                }
+                if (3 < abs(jet->Eta) && abs(jet->Eta) < 4) {
+                  plots->fmatchedTrackdT[m][2][k][3]->Fill(deltaT);
+                  plots->fmatchedTrackDZ[m][2][k][3]->Fill(deltaZ);
+                  plots->fmatchedTrackTOuter[m][2][k][3]->Fill(TOuter);
+                }
               }
               // for the jet time
               t_jet[m][k] += (pf->T ); // mean jet time
@@ -608,8 +699,11 @@ for (size_t i = 0; i < 3; i++) {
 
               ++n_tracks[m][k];
             } // end charged pf
-          } // end pf cands
+          } // --------END pf candidates----------------
         } // END JET CONSTITUENTS
+
+        if(debug){cout << "-------- fill plots: finished jet constituents ---------"<< endl;}
+
         if (n_tracks[m][k]!=0) {
           // signal efficiency and mistag rate of jets
           mistag_rate[m][k]=n_PU_tracks[m][k]/n_tracks[m][k];
@@ -703,7 +797,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("PLOTS/10kevents/macro_jets_snowmass_jet_time/");
+    gSystem->cd("PLOTS/10kevents/QCD/macro_jets_snowmass/");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

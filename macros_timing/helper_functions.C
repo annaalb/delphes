@@ -18,6 +18,17 @@ double get_distance(Jet *jet, GenParticle* genpart)
     return distance;
 }
 
+double get_distance(Jet *jet, ParticleFlowCandidate* pf)
+{
+    double distance;
+    double Delta_Eta;
+    double Delta_Phi;
+    Delta_Eta = jet->Eta - pf->Eta;
+    Delta_Phi = jet->Phi - pf->Phi;
+    distance = sqrt(pow(Delta_Eta,2) + pow(Delta_Phi,2));
+    return distance;
+}
+
 double get_distance(Jet *jet1, Jet *jet2)
 {
     double distance;

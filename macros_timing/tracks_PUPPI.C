@@ -196,7 +196,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     SetupGlobalStyle();
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("Plots/tracks_PUPPI/");
+    gSystem->cd("Plots/10kevents/tracks_PUPPI/");
 
     PrintHistograms(result, plots);
 
