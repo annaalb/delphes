@@ -13,7 +13,8 @@
 # Order of execution of various modules
 #######################################
 
-set MaxEvents 10
+#set SkipEvents 1000
+set MaxEvents 100
 
 set ExecutionPath {
 
@@ -49,6 +50,7 @@ set ExecutionPath {
   TowerMerger
   NeutralEFlowMerger
 
+  EFlowMergerPF
   EFlowMerger
   Rho
 
@@ -101,6 +103,8 @@ set ExecutionPath {
 
   PuppiMissingET
   ScalarHT
+
+  FastJetFinderPF
 
   FastJetFinderCHS
   JetPileUpSubtractor
@@ -821,6 +825,18 @@ module Merger NeutralEFlowMerger {
 }
 
 #####################
+# Energy flow merger PF (no PU mitigation)
+#####################
+
+module Merger EFlowMergerPF {
+# add InputArray InputArray
+  add InputArray HCal/eflowTracks
+  add InputArray PhotonEnergySmearing/eflowPhotons
+  add InputArray HCal/eflowNeutralHadrons
+  set OutputArray eflow
+}
+
+#####################
 # Energy flow merger CHS
 #####################
 
@@ -1082,6 +1098,25 @@ module FastJetGridMedianEstimator Rho {
   add GridRange 1.5 4.0 1.0 1.0
   add GridRange 4.0 5.0 1.0 1.0
 
+}
+
+##############
+# Jet finder
+##############
+
+module FastJetFinder FastJetFinderPF {
+
+  set InputArray EFlowMergerPF/eflow
+
+  set OutputArray jets
+
+  # set AreaAlgorithm 5
+
+  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
+  set JetAlgorithm 6
+  set ParameterR 0.4
+
+  set JetPTMin 15.0
 }
 
 ##############
@@ -7467,6 +7502,7 @@ module TreeWriter TreeWriter {
   add Branch TrackSmearing/tracks TimeSmearedTrack Track
   add Branch RecoPuFilter/eflowTracks RecoPuTrack Track
 
+  add Branch EFlowMergerPF/eflow ParticleFlowCandidatePF ParticleFlowCandidate
   add Branch EFlowMerger/eflow ParticleFlowCandidateCHS ParticleFlowCandidate
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
 
@@ -7490,6 +7526,8 @@ module TreeWriter TreeWriter {
 
   # add Branch FastJetFinderCHS/constituents JetConstituentsCHS GenParticle
   # add Branch FastJetFinderCHS/jets FastJetCHS Jet
+
+  add Branch FastJetFinderPF/jets FastJetFinderPF Jet
 
   add Branch JetSmearCHS/jets JetCHS Jet
   add Branch JetSmearPUPPI/jets JetPUPPI Jet
