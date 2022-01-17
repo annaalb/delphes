@@ -153,18 +153,38 @@ void TrackPileUpSubtractor::Process()
       phi = candidateMomentum.Phi();
       e = candidateMomentum.E();
 
-      z = particle->Position.Z();
+      Bool_t _debug=false;
+
+      //z = particle->Position.Z();
+      z = candidate->InitialPosition.Z();
+      
+      if (_debug) {
+        std::cout << "particle->position->Z = " << particle->Position.Z() << '\n';
+        std::cout << "candidate->InitialPosition.Z() = " <<  candidate->InitialPosition.Z() << '\n';
+      }
 
       // apply pile-up subtraction
       // assume perfect pile-up subtraction for tracks outside fZVertexResolution
 
       //if(candidate->Charge != 0 && candidate->IsPU && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
+
+      if (_debug && candidate->Charge != 0) {
+        std::cout << "---- Module TrackPileUpSubtractor ----" << '\n';
+        std::cout << "z = "<<z << '\n';
+        std::cout << "zvtx = " << zvtx << '\n';
+        std::cout << "abs(z - zvtx) = "<<TMath::Abs(z - zvtx) << '\n';
+        std::cout << "fFormula->Eval(pt, eta, phi, e) * 1.0e3 = "<< fFormula->Eval(pt, eta, phi, e) * 1.0e3 << '\n';
+
+      }
       if(candidate->Charge != 0 && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3) // include also signal track rejection
       {
         candidate->IsRecoPU = 1;
       }
       else
       {
+        if (_debug) {
+          std::cout << "******************************** dz < dz_cut ******************************" << '\n';
+        }
         candidate->IsRecoPU = 0;
         if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
       }
