@@ -14,7 +14,7 @@
 #######################################
 
 set SkipEvents 0
-set MaxEvents 100
+set MaxEvents 10
 
 set ExecutionPath {
 
@@ -791,6 +791,9 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
   # after track smearing is applied, assume fix dz cut (original: 0.0001 m ) given in m
   set ZVertexResolution { 0.001}
 
+  # after track smearing is applied, assume fix dt cut given in ?
+  set TVertexResolution { 10}
+
  }
 
 ########################
@@ -1206,8 +1209,50 @@ module EnergyScale JetScaleCHS {
 #  set InputArray FastJetFinderCHS/jets
   set OutputArray jets
 
- # scale formula for jets
-  set ScaleFormula {1.00}
+  # scale formula for jets
+     ### jetpuppi tightID momentum scale
+   set ScaleFormula {
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (1.45) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.953) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.910) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.912) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.930) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.953) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.968) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.983) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.988) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.992) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (1.200) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (1.103) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (1.037) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (1.007) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (1.002) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (1.005) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (1.004) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (1.003) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.997) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.996) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (1.057) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.855) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.776) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.801) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.810) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.860) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.913) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.926) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.963) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (1.971) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (1.465) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (1.213) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (1.054) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.986) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.957) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (1.010) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (1.000) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (1.000) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000)
+   }
 }
 
 module EnergyScale JetScalePUPPI {
@@ -1279,9 +1324,50 @@ module MomentumSmearing JetSmearCHS {
   set OutputArray jets
   set UseMomentumVector true
 
- ## DUMMY_JETPUPPIAK8_SMEAR
-  set ResolutionFormula {1.00e-10}
- ## ENDDUMMY_JETPUPPIAK8_SMEAR
+  # scale formula for jets
+    ### jetpuppi tightID momentum resolution
+   set ResolutionFormula {
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (0.60) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.20) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.10) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.07) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.08) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.15) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.08) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.08) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.065) +
+    (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.04) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (0.70) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (0.70) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (0.35) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (0.27) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (0.30) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (0.28) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (0.22) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (0.16) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.10) +
+    (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (0.55) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.47) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.38) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.25) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.26) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.29) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.20) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.18) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.11) +
+    (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (0.05) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (0.50) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (0.25) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (0.19) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (0.19) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.08) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.04) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (0.00) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (0.00) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (0.00) +
+    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00)
+   }
 }
 
 module MomentumSmearing JetSmearPUPPI {
@@ -7499,15 +7585,15 @@ module TreeWriter TreeWriter {
   add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
   add Branch TrackMerger/tracks Track Track
-  add Branch TrackSmearing/tracks TimeSmearedTrack Track
+  add Branch TimeSmearing/tracks TimeSmearedTrack Track
   add Branch RecoPuFilter/eflowTracks RecoPuTrack Track
 
   add Branch EFlowMergerPF/eflow ParticleFlowCandidatePF ParticleFlowCandidate
   add Branch EFlowMerger/eflow ParticleFlowCandidateCHS ParticleFlowCandidate
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
 
-  add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
-  add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
+  #add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
+  #add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
 
   add Branch PhotonSmear/photons Photon Photon
   add Branch PhotonFakeMergerLoose/photons PhotonLoose Photon

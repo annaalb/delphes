@@ -14,7 +14,7 @@
 #######################################
 
 set SkipEvents 0
-set MaxEvents 100
+set MaxEvents 1000
 
 set ExecutionPath {
 
@@ -1215,49 +1215,7 @@ module EnergyScale JetScalePUPPI {
   set OutputArray jets
 
  # scale formula for jets
-    ### jetpuppi tightID momentum scale
-  set ScaleFormula {
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (1.45) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.953) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.910) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.912) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.930) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.953) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.968) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.983) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.988) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.992) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (1.200) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (1.103) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (1.037) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (1.007) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (1.002) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (1.005) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (1.004) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (1.003) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.997) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.996) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (1.057) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.855) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.776) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.801) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.810) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.860) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.913) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.926) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.963) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (1.971) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (1.465) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (1.213) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (1.054) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.986) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.957) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (1.010) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (1.000) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (1.000) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000)
-  }
+  set ScaleFormula { 1.00 }
 
 }
 module EnergyScale JetScalePUPPIAK8 {
@@ -1291,48 +1249,7 @@ module MomentumSmearing JetSmearPUPPI {
 
  # scale formula for jets
    ### jetpuppi tightID momentum resolution
-  set ResolutionFormula {
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (0.60) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.20) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.10) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.07) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.08) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.15) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.08) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.08) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.065) +
-   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.04) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (0.70) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (0.70) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (0.35) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (0.27) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (0.30) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (0.28) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (0.22) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (0.16) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.10) +
-   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (0.55) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.47) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.38) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.25) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.26) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.29) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.20) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.18) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.11) +
-   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (0.05) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (0.50) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (0.25) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (0.19) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (0.19) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.08) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.04) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (0.00) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (0.00) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (0.00) +
-   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00)
-  }
+   set ResolutionFormula {1.00e-10}
 }
 
 module MomentumSmearing JetSmearPUPPIAK8 {
