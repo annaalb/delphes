@@ -47,6 +47,8 @@ public:
 
 private:
   DelphesFormula *fFormula; //!
+  DelphesFormula *fFormulaTime; //!
+  Double_t fEtaMax;
 
   Double_t fPTMin;
 
