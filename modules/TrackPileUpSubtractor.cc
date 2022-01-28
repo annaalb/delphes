@@ -191,23 +191,21 @@ void TrackPileUpSubtractor::Process()
       Bool_t dt_smaller = (TMath::Abs(t - tvtx) < fFormulaTime->Eval(pt, eta, phi, e) );
       Bool_t eta_smaller = (TMath::Abs(eta)<fEtaMax);
 
-      if (eta>4) {
-        eta_smaller=false;
-      }
+      if (TMath::Abs(eta)>=4) {eta_smaller=false;}
 
       // handle two eta regions:
       // 1. (eta > etaMax) keep tracks if dz < x
       // 2. (eta < etaMax) keep tracks if dz < x and dt < y
       if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) ) // include also signal track rejection // default Eta max = 0 (only dz cut)
       {
-        if (_debug) {
-             std::cout << "******************************** IsRecoPU = 0 ******************************" << '\n';
-             std::cout << "charged "<< charged << '\n';
-             std::cout << "eta_smaller "<< eta_smaller << '\n';
-             std::cout << "dz_smaller "<< dz_smaller << '\n';
-             std::cout << "dt_smaller "<< dt_smaller << '\n';
-
-           }
+        // if (_debug) {
+        //      std::cout << "******************************** IsRecoPU = 0 ******************************" << '\n';
+        //      std::cout << "charged "<< charged << '\n';
+        //      std::cout << "eta_smaller "<< eta_smaller << '\n';
+        //      std::cout << "dz_smaller "<< dz_smaller << '\n';
+        //      std::cout << "dt_smaller "<< dt_smaller << '\n';
+        //
+        //    }
         candidate->IsRecoPU = 0;
         if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
       }
