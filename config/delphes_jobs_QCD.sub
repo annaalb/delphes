@@ -1,0 +1,6 @@
+executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/submit_files/QCD/EtaMax3/submit_card_$(ProcId).sh
+output = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId)_$(ProcId).out
+error = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId)_$(ProcId).err
+log = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId).log
++JobFlavour = "microcentury"
+queue 10
