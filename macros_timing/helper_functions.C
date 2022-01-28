@@ -69,7 +69,7 @@ Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double match
     return matched_jet;
 }
 
-Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius)
+Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius, double pt_min)
 {
     Jet *matched_jet;
     Jet *jet;
@@ -79,11 +79,13 @@ Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radi
     {
     for (size_t k = 0; k < branchJet->GetEntriesFast(); k++) { // loop over jets
         jet = (Jet*) branchJet->At(k);
-        distance = get_distance(jet, jet_in);
-        if (distance < matching_radius) { // is the jet closer than the previous one?
-            matched_jet = jet;
-            matching_radius = distance; // new distance to matched jet
-            matched = true;
+        if(jet->PT > pt_min){ // min pt for genjet
+            distance = get_distance(jet, jet_in);
+            if (distance < matching_radius) { // is the jet closer than the previous one?
+                matched_jet = jet;
+                matching_radius = distance; // new distance to matched jet
+                matched = true;
+            }
         }
     }// end loop over jets
     }

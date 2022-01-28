@@ -10,9 +10,12 @@ void comparison_plots_VBF_QCD()
   //SetStyle();
   SetupGlobalStyle();
   // read from results.root
-  TFile *f = new TFile("PLOTS/10kevents/VBF_sample/macro_jets_snowmass_dz_smeared_JES_applied/results.root");
-  //TFile *f_QCD = new TFile("PLOTS/10kevents/QCD/macro_jets_snowmass/results.root");
-  TFile *f_QCD = new TFile("PLOTS/10kevents/QCD/macro_QCD_jets_dz_smeared_JES_applied/results.root");
+  TFile *f_Eta0 = new TFile("PLOTS/10kevents/VBF_sample/macro_jets_snowmass_dz_smeared_JES_applied/results.root");
+  TFile *f_Eta0_QCD = new TFile("PLOTS/10kevents/QCD/macro_QCD_jets_dz_smeared_JES_applied/results.root");
+  TFile *f_Eta3 = new TFile("PLOTS/study_timing_cut/VBF/macro_jets_snowmass_EtaMax3/results.root");
+  TFile *f_Eta3_QCD = new TFile("PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax3/results.root");
+  TFile *f_Eta4 = new TFile("PLOTS/study_timing_cut/VBF/macro_jets_snowmass_EtaMax3/results.root");
+  TFile *f_Eta4_QCD = new TFile("PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax3/results.root");
 
   TCanvas* canvas = new TCanvas("c", "c", 600, 600);
   gPad->SetLeftMargin(0.2);
@@ -27,18 +30,8 @@ void comparison_plots_VBF_QCD()
 
   TString name[3] = {"CHS", "PUPPI", "GenJet"};
   TString category[3] = {"VBF", "b", "PU"};
-  TString IsPU[3] = {"", "_signal", "_PU"};
-  TString eta[4] = {"", "_eta02", "_eta23", "_eta34"};
 
-  TString variable[4] = {"_jet_time_minus_PV", "_jet_pt_weighted_time_minus_PV",  "_track_DZ", "_track_T"};
-  TString variablenames[4] = {"jet_time_minus_PV [ns]", "jet_pt_weighted_time_minus_PV [ns]" ,"track dZ [m]", "track dT [ns]"};
-
-  Int_t k = 0;
   // get the histograms
-  for (size_t i = 0; i < 2; i++) { // CHS or PUPPI
-      for (size_t l = 0; l < 2; l++) {  // variables
-        for (size_t e = 0; e < 1; e++) { // eta bins
-          //if (l>2) { for (size_t k = 0; k < 3; k++) { // split tracks into signal / PU
     track_VBF[i][k] = ((TH1F*)f->Get(category[0]+"_"+name[i]+IsPU[k]+variable[l]+eta[e]));
     track_b[i][k] = ((TH1F*)f->Get(category[1]+"_"+name[i]+IsPU[k]+variable[l]+eta[e]));
     track_PU[i][k] = ((TH1F*)f_QCD->Get(category[2]+"_"+name[i]+IsPU[k]+variable[l]+eta[e]));
