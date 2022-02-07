@@ -7,6 +7,35 @@ R__LOAD_LIBRARY(libDelphes)
 
 //-----------Helper functions-------------------------------------------------------------------
 
+Double_t get_SF(Jet* jet, string filename)
+{
+    float sf=1;
+    Double_t eta = jet->Eta;
+    Double_t pt = jet->PT;
+    std::ifstream jecfile;
+    jecfile.open(filename);
+    std::cout<<"JEC filename  "<<filename<<std::endl;
+    jecfile.clear();
+    jecfile.seekg(ios::beg);
+    float etamin, etamax;
+    float ptmin,ptmax;
+    float SF;
+
+    while(!jecfile.eof( ))
+    {
+      jecfile >> etamin >> etamax >> ptmin >> ptmax >> SF;
+      if (etamin < eta && etamax > eta){
+          if (ptmin < pt && ptmax > pt) {
+              sf=SF;
+              cout << "SF " << sf << endl;
+              break;
+          }
+      }
+    }
+    jecfile.close();
+    return sf;
+}
+
 double get_distance(Jet *jet, GenParticle* genpart)
 {
     double distance;
@@ -69,7 +98,7 @@ Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double match
     return matched_jet;
 }
 
-Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius, double pt_min)
+Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius, double pt_min, Bool_t do_JEC=false, string jecfile="")
 {
     Jet *matched_jet;
     Jet *jet;
@@ -79,7 +108,13 @@ Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radi
     {
     for (size_t k = 0; k < branchJet->GetEntriesFast(); k++) { // loop over jets
         jet = (Jet*) branchJet->At(k);
-        if(jet->PT > pt_min){ // min pt for genjet
+        // for reco jets apply SF
+        Double_t reco_pt = jet->PT;
+        Double_t sf = get_SF(jet, jecfile);
+        Double_t corrected_pt = reco_pt*sf;
+        if (do_JEC) {reco_pt = corrected_pt;}
+
+        if(reco_pt > pt_min){ // min pt for genjet
             distance = get_distance(jet, jet_in);
             if (distance < matching_radius) { // is the jet closer than the previous one?
                 matched_jet = jet;
