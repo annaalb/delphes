@@ -9,10 +9,16 @@ void comparison_plots_VBF_PU()
 {
   //SetStyle();
   SetupGlobalStyle();
+  TFile *f[3];
+  TFile *f_QCD[3];
   // read from results.root
-  //TFile *f = new TFile("PLOTS/10kevents/macro_jets_snowmass_jet_time/results.root");
-  //TFile *f = new TFile("PLOTS/10kevents/test_PF_jets/results.root");
-  TFile *f = new TFile("PLOTS/10kevents/QCD/macro_jets_snowmass/results.root");
+  f[0] = new TFile("PLOTS/study_timing_cut/VBF/macro_jets_snowmass_EtaMax0/results.root");
+  f[1] = new TFile("PLOTS/study_timing_cut/VBF/macro_jets_snowmass_EtaMax3/results.root");
+  f[2] = new TFile("PLOTS/study_timing_cut/VBF/macro_jets_snowmass_EtaMax4/results.root");
+
+  f_QCD[0] = new TFile("PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax0/results.root");
+  f_QCD[1] = new TFile("PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax3/results.root");
+  f_QCD[2] = new TFile("PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax4/results.root");
 
   TCanvas* canvas = new TCanvas("c", "c", 600, 600);
   gPad->SetLeftMargin(0.2);

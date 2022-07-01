@@ -36,8 +36,7 @@ PUPPI_file_list["PUPPI_EtaMax0"] = PUPPI_EtaMax0
 PUPPI_file_list["PUPPI_EtaMax3"] = PUPPI_EtaMax3
 PUPPI_file_list["PUPPI_EtaMax4"] = PUPPI_EtaMax4
 
-
-def create_JEC(file_list, filename):
+def create_JEC(file_list, filename, CHSorPUPPI):
 
     etabins = ["eta0p0to1p3","eta1p3to2p0","eta2p0to3","eta3to4","eta4p0toInf"]
     ptbins = ["pt0to20","pt20to30","pt30to50","pt50to80","pt80to100","pt100toInf"]
@@ -51,8 +50,8 @@ def create_JEC(file_list, filename):
             for pt in ptbins:
 
                 print(el)
-                hist = file_list[el].Get("PUPPI_RecoJet_response_"+eta+"_"+pt)
-                print("PUPPI_RecoJet_response"+eta+pt)
+                hist = file_list[el].Get(CHSorPUPPI+"_RecoJet_response_"+eta+"_"+pt)
+                print(CHSorPUPPI+"_RecoJet_response"+eta+pt)
                 gaussian_fit = TF1("gaussian_fit", "gaus", 0.2, 2.0);
                 gaussian_fit.SetParameter(1, 1.0);
                 gaussian_fit.SetParameter(2, 0.1);
@@ -70,14 +69,17 @@ def create_JEC(file_list, filename):
                     fit_result = hist.Fit(gaussian_fit,"R");
 
                 resolution_gauss = 0
-                if gaussian_fit.GetParameter(2) !=0:
+                if (gaussian_fit.GetParameter(2) !=0 and gaussian_fit.GetParameter(1) !=0):
                     resolution_gauss = gaussian_fit.GetParameter(2)/gaussian_fit.GetParameter(1)
 
 
                 print("#mu = %.3f"%(gaussian_fit.GetParameter(1)))
                 print("#sigma = %.3f"%(resolution_gauss))
 
-                resolution_dict[el][eta][pt] = 1+((1-gaussian_fit.GetParameter(1))/gaussian_fit.GetParameter(1))
+                if (gaussian_fit.GetParameter(2) !=0 and gaussian_fit.GetParameter(1) !=0):
+                    resolution_dict[el][eta][pt] = 1+((1-gaussian_fit.GetParameter(1))/gaussian_fit.GetParameter(1))
+                else:
+                    resolution_dict[el][eta][pt] = 1
                 print(gaussian_fit.GetParameter(1) * resolution_dict[el][eta][pt])
 
 
@@ -98,6 +100,7 @@ def create_JEC(file_list, filename):
             etamax = eta
             etamin = etamin.replace("eta","").split("to")[0].replace("p",".")
             etamax = etamax.replace("eta","").split("to")[1].replace("p",".")
+            if "Inf" in etamax: etamax = '10000'
 
             for pt in sorted(resolution_dict[el][eta]):
 
@@ -121,8 +124,8 @@ def create_JEC(file_list, filename):
             print(correction_string)
 
 
-
     f.close()
 
 
-create_JEC(PUPPI_file_list, "PUPPI_")
+#create_JEC(PUPPI_file_list, "PUPPI_", "PUPPI")
+create_JEC(PUPPI_file_list, "CHS_", "CHS")

@@ -58,8 +58,10 @@ struct MyPlots
 
   // jets -> tracks Plots (jet branch (CHS and PUPPI, genjet), signal or PU)
   TH1 *fjetTrackPT[4][3];
-  TH1 *fjetTrackEta[4][3];
   // in eta bins
+  TH2 *fjetTrackEtaPt[4][3][6];
+
+  TH1 *fjetTrackEta[4][3][6];
   TH1 *fjetTrackdT[4][3][6];
   TH1 *fjetTrackDZ[4][3][6];
   TH1 *fjetTrackTOuter[4][3][6];
@@ -198,10 +200,13 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
             plots->fjetTrackPT[i][k] = result->AddHist1D(
                name[i]+name2[k]+"_track_pt",  " track P_{T}",
                " track P_{T}, GeV/c", "number of tracks", 100, 0.0, 10.0);
-            plots->fjetTrackEta[i][k] = result->AddHist1D(
-               name[i]+name2[k]+"_track_eta",  " track #eta",
-               " track #eta", "number of tracks", 100, -5.0, 5.0);
             for (size_t e = 0; e < 6; e++) { // eta regions
+              plots->fjetTrackEtaPt[i][k][e] = result->AddHist2D(
+                 name[i]+name2[k]+"_track_eta_pt"+etabin[e],  " track #eta pt",
+                 " track |#eta|", "track p_{T}", 50, 0.0, 5.0, 100, 0, 10);
+              plots->fjetTrackEta[i][k][e] = result->AddHist1D(
+                 name[i]+name2[k]+"_track_eta"+etabin[e],  " track #eta",
+                 " track #eta", "number of tracks", 100, -5.0, 5.0);
             plots->fjetTrackdT[i][k][e] = result->AddHist1D(
                name[i]+name2[k]+"_track_T"+etabin[e],  " track T",
                " track dT [ns]", "number of tracks", 100, -1, 1);
@@ -343,8 +348,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
         Jet* jet;
         for (size_t k = 0; k < branchJets[m]->GetEntriesFast(); k++) {
           jet = (Jet*) branchJets[m]->At(k);
-          plots->fjetPT[m]->Fill(jet->PT);
           if (jet->PT > 20) {
+            plots->fjetPT[m]->Fill(jet->PT);
             plots->fjetEta[m]->Fill(jet->Eta);
           }
          }
@@ -532,13 +537,17 @@ for (size_t i = 0; i < 5; i++) {
             if (pf->Charge != 0) { // charged pf -> tracks
               GenParticle *p = static_cast<GenParticle*>(pf->Particles.At(0));
               plots->fjetTrackPT[m][0]->Fill(pf->PT);
-              plots->fjetTrackEta[m][0]->Fill(pf->Eta);
 
               // in eta bins (first inclusive)
+              plots->fjetTrackEtaPt[m][0][0]->Fill(abs(pf->Eta), pf->PT);
+              plots->fjetTrackEtaPt[m][0][eta_index]->Fill(abs(pf->Eta), pf->PT);
+
+              plots->fjetTrackEta[m][0][0]->Fill(pf->Eta);
               plots->fjetTrackdT[m][0][0]->Fill(deltaT);
               plots->fjetTrackDZ[m][0][0]->Fill(deltaZ);
               plots->fjetTrackTOuter[m][0][0]->Fill(TOuter);
 
+              plots->fjetTrackEta[m][0][eta_index]->Fill(pf->Eta);
               plots->fjetTrackdT[m][0][eta_index]->Fill(deltaT);
               plots->fjetTrackDZ[m][0][eta_index]->Fill(deltaZ);
               plots->fjetTrackTOuter[m][0][eta_index]->Fill(TOuter);
@@ -546,31 +555,38 @@ for (size_t i = 0; i < 5; i++) {
               if (p->IsPU == 0) { // signal tracks
                 ++n_signal_tracks [m];
                 plots->fjetTrackPT[m][1]->Fill(pf->PT);
-                plots->fjetTrackEta[m][1]->Fill(pf->Eta);
 
                 // in eta bins (first inclusive)
+                plots->fjetTrackEtaPt[m][1][0]->Fill(abs(pf->Eta), pf->PT);
+                plots->fjetTrackEtaPt[m][1][eta_index]->Fill(abs(pf->Eta), pf->PT);
+                plots->fjetTrackEta[m][1][0]->Fill(pf->Eta);
                 plots->fjetTrackdT[m][1][0]->Fill(deltaT);
                 plots->fjetTrackDZ[m][1][0]->Fill(deltaZ);
                 plots->fjetTrackTOuter[m][1][0]->Fill(TOuter);
 
-                  plots->fjetTrackdT[m][1][eta_index]->Fill(deltaT);
-                  plots->fjetTrackDZ[m][1][eta_index]->Fill(deltaZ);
-                  plots->fjetTrackTOuter[m][1][eta_index]->Fill(TOuter);
+                plots->fjetTrackEta[m][1][eta_index]->Fill(pf->Eta);
+                plots->fjetTrackdT[m][1][eta_index]->Fill(deltaT);
+                plots->fjetTrackDZ[m][1][eta_index]->Fill(deltaZ);
+                plots->fjetTrackTOuter[m][1][eta_index]->Fill(TOuter);
 
               }
               else if (p->IsPU == 1) { // PU tracks
                 ++n_PU_tracks [m];
                 plots->fjetTrackPT[m][2]->Fill(pf->PT);
-                plots->fjetTrackEta[m][2]->Fill(pf->Eta);
 
                 // in eta bins (first inclusive)
+                plots->fjetTrackEtaPt[m][2][0]->Fill(abs(pf->Eta), pf->PT);
+                plots->fjetTrackEtaPt[m][2][eta_index]->Fill(abs(pf->Eta), pf->PT);
+
+                plots->fjetTrackEta[m][2][0]->Fill(pf->Eta);
                 plots->fjetTrackdT[m][2][0]->Fill(deltaT);
                 plots->fjetTrackDZ[m][2][0]->Fill(deltaZ);
                 plots->fjetTrackTOuter[m][2][0]->Fill(TOuter);
 
-                  plots->fjetTrackdT[m][2][eta_index]->Fill(deltaT);
-                  plots->fjetTrackDZ[m][2][eta_index]->Fill(deltaZ);
-                  plots->fjetTrackTOuter[m][2][eta_index]->Fill(TOuter);
+                plots->fjetTrackEta[m][2][eta_index]->Fill(pf->Eta);
+                plots->fjetTrackdT[m][2][eta_index]->Fill(deltaT);
+                plots->fjetTrackDZ[m][2][eta_index]->Fill(deltaZ);
+                plots->fjetTrackTOuter[m][2][eta_index]->Fill(TOuter);
 
               }
               // for the jet time
@@ -669,8 +685,8 @@ for (size_t m = 0; m < 2; m++) {
   }
 
   //------------------------------------------------------------------------------
-
-  void macro_QCD_jets(const char *inputFile)
+  // root -l -b -q macros_timing/macro_QCD_jets.C'("ROOTOUTPUT/QCD/EtaMax3/CMS_PhaseII_Snowmass_200PU_QCD_10k_EtaMax3.root", "PLOTS/study_timing_cut/QCD/macro_QCD_jets_EtaMax3")'
+  void macro_QCD_jets(const char *inputFile, const char *output)
   {
     gSystem->Load("libDelphes");
 
@@ -688,7 +704,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("PLOTS/10kevents/QCD/macro_QCD_jets_dz_smeared_JES_applied/");
+    gSystem->cd(output);
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

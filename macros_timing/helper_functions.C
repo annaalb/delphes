@@ -6,36 +6,7 @@ R__LOAD_LIBRARY(libDelphes)
 #endif
 
 //-----------Helper functions-------------------------------------------------------------------
-
-Double_t get_SF(Jet* jet, string filename)
-{
-    float sf=1;
-    Double_t eta = jet->Eta;
-    Double_t pt = jet->PT;
-    std::ifstream jecfile;
-    jecfile.open(filename);
-    std::cout<<"JEC filename  "<<filename<<std::endl;
-    jecfile.clear();
-    jecfile.seekg(ios::beg);
-    float etamin, etamax;
-    float ptmin,ptmax;
-    float SF;
-
-    while(!jecfile.eof( ))
-    {
-      jecfile >> etamin >> etamax >> ptmin >> ptmax >> SF;
-      if (etamin < eta && etamax > eta){
-          if (ptmin < pt && ptmax > pt) {
-              sf=SF;
-              cout << "SF " << sf << endl;
-              break;
-          }
-      }
-    }
-    jecfile.close();
-    return sf;
-}
-
+// --- get distance ----
 double get_distance(Jet *jet, GenParticle* genpart)
 {
     double distance;
@@ -78,6 +49,69 @@ double get_distance(Vertex *vertex, Track *track)
     }
     return distance;
 }
+// -- get SF ---
+Double_t get_SF(Jet* recojet, TClonesArray *genjets, string filename)
+{
+    float sf=1;
+    Double_t eta;
+    Double_t pt;
+    std::ifstream jecfile;
+    jecfile.open(filename);
+    //std::cout<<"JEC filename  "<<filename<<std::endl;
+    jecfile.clear();
+    jecfile.seekg(ios::beg);
+    float etamin, etamax;
+    float ptmin,ptmax;
+    float SF;
+
+    Bool_t is_matched;
+    // do matching here and set is_matched to true and genjet
+    Jet *matched_jet;
+    Jet *genjet;
+    double distance;
+    double matching_radius = 0.4;
+    double pt_min = 10;
+    if(genjets->GetEntriesFast() > 0)
+    {
+    for (size_t k = 0; k < genjets->GetEntriesFast(); k++) { // loop over genjets
+        genjet = (Jet*) genjets->At(k);
+        if (genjet->PT > pt_min) {
+            distance = get_distance(genjet, recojet);
+            if (distance < matching_radius) { // is the jet closer than the previous one?
+                is_matched = true;
+                matched_jet = genjet;
+                matching_radius = distance; // new distance to matched jet
+            }
+        }
+    }// end loop over jets
+    }
+    // get gen or reco jet pt
+    if (is_matched) {
+        eta = abs(matched_jet->Eta);
+        pt = matched_jet->PT;
+        //cout << "Genjet matched pt = "<< pt << ", eta = " << eta << endl;
+    }
+    else{
+        eta = abs(recojet->Eta);
+        pt = recojet->PT;
+        //cout << "recojet pt = "<< pt << ", eta = " << eta << endl;
+    }
+    // set reco jet pt depending on SF (in gen or reco jet pt bins, depending on the matching)
+    while(!jecfile.eof( ))
+    {
+      jecfile >> etamin >> etamax >> ptmin >> ptmax >> SF;
+      if (etamin < eta && etamax > eta){
+          if (ptmin < pt && ptmax > pt) {
+              //cout << "etamin = "<< etamin <<", etamax= "<< etamax << ", ptmin = " <<ptmin << ", ptmax = "<< ptmax << ", SF = "<< SF << endl;
+             // cout << "CORRECTED reco jet pt = " << (recojet->PT*SF) << endl;
+              sf=SF;
+              break;
+          }
+      }
+    }
+    jecfile.close();
+    return sf;
+}
 
 Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double matching_radius)
 {
@@ -98,7 +132,41 @@ Jet* get_closest_jet(TClonesArray *branchJet, GenParticle* genpart, double match
     return matched_jet;
 }
 
-Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius, double pt_min, Bool_t do_JEC=false, string jecfile="")
+// uses SF for the reco jet pt cut, if doJEC = true
+Bool_t matched_to_recojet(TClonesArray *recojets, Jet* genjet, double matching_radius, double pt_min, TClonesArray *genjets, Bool_t do_JEC=false, string jecfile="")
+{
+    Jet *matched_jet;
+    Jet *recojet;
+    double distance;
+    Bool_t matched = false;
+    if(recojets->GetEntriesFast() > 0)
+    {
+    for (size_t k = 0; k < recojets->GetEntriesFast(); k++) { // loop over jets
+        recojet = (Jet*) recojets->At(k);
+        // for reco jets apply SF
+        Double_t reco_pt = recojet->PT;
+        Double_t sf;
+        Double_t corrected_pt;
+        if (do_JEC) {
+            sf = get_SF(recojet, genjets, jecfile);
+            corrected_pt = reco_pt*sf;
+            reco_pt = corrected_pt;
+        }
+
+        if(reco_pt > pt_min){ // min pt for recojet
+            distance = get_distance(recojet, genjet);
+            if (distance < matching_radius) { // is the jet closer than the previous one?
+                matched_jet = recojet;
+                matching_radius = distance; // new distance to matched jet
+                matched = true;
+            }
+        }
+    }// end loop over jets
+    }
+    return matched;
+}
+
+Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radius, double pt_min)
 {
     Jet *matched_jet;
     Jet *jet;
@@ -110,9 +178,6 @@ Bool_t matched_to_jet(TClonesArray *branchJet, Jet* jet_in, double matching_radi
         jet = (Jet*) branchJet->At(k);
         // for reco jets apply SF
         Double_t reco_pt = jet->PT;
-        Double_t sf = get_SF(jet, jecfile);
-        Double_t corrected_pt = reco_pt*sf;
-        if (do_JEC) {reco_pt = corrected_pt;}
 
         if(reco_pt > pt_min){ // min pt for genjet
             distance = get_distance(jet, jet_in);

@@ -137,6 +137,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     // Loop over all events
     for(entry = 0; entry < allEntries; ++entry)
     {
+      cout << "Process event " << entry+1 << " of total " << allEntries << endl;
       // Load selected branches with data from specified event
       treeReader->ReadEntry(entry);
 
@@ -273,7 +274,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
   //------------------------------------------------------------------------------
 
-  void track_control_plots(const char *inputFile)
+// root -l -b -q macros_timing/track_control_plots.C'("ROOTOUTPUT/VBF/EtaMax3/CMS_PhaseII_Snowmass_200PU_VBF_10k_ptmin10_EtaMax3.root", "PLOTS/study_timing_cut/VBF/track_control_plots_EtaMax3")'
+  void track_control_plots(const char *inputFile, const char *output)
   {
     gSystem->Load("libDelphes");
 
@@ -288,7 +290,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     SetupGlobalStyle();
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("PLOTS/study_timing_cut/VBF/track_control_plots_EtaMax3");
+    gSystem->cd(output);
 
     PrintHistograms(result, plots);
 

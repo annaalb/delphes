@@ -41,9 +41,9 @@ class ExRootTreeReader;
 
 void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 {
-  TString name[3] = {"CHS", "PUPPI", "GenJet"};
-  TString ptbin[7] = {"pt0to20","pt20to30","pt30to50","pt50to80","pt80to100","pt100toInf"};
-  TString etabin[6] = {"eta0p0to1p3","eta1p3to2p0","eta2p0to3","eta3to4","eta4p0toInf"};
+  TString name[3] = {"PUPPI", "CHS", "GenJet"};
+  TString ptbin[7] = {"pt0toInf","pt0to20","pt20to30","pt30to50","pt50to80","pt80to100","pt100toInf"};
+  TString etabin[6] = {"eta0p0toInf", "eta0p0to1p3","eta1p3to2p0","eta2p0to3","eta3to4","eta4p0toInf"};
 
   for (size_t e = 0; e < 6; e++) {
   plots->fGenJetPT[e] = result->AddHist1D(
@@ -77,24 +77,25 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
   void AnalyseEvents(ExRootTreeReader *treeReader, MyPlots *plots, string etamax)
   {
 
-    TClonesArray *branchCHSeflow = treeReader->UseBranch("ParticleFlowCandidateCHS");
+  //  TClonesArray *branchCHSeflow = treeReader->UseBranch("ParticleFlowCandidateCHS");
     TClonesArray *branchPuppiParticle = treeReader->UseBranch("ParticleFlowCandidate");
 
     TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
-    TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
+  //  TClonesArray *branchfilteredParticle = treeReader->UseBranch("filteredParticle"); // input to genjets
 
-    TClonesArray *branchMergerParticle = treeReader->UseBranch("mergerParticle"); // input to tracks
+  //  TClonesArray *branchMergerParticle = treeReader->UseBranch("mergerParticle"); // input to tracks
 
-    TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
+  //  TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
 
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
 
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
-    Int_t nbranches = 3;
+    Int_t nbranches = 2;
 
-    TClonesArray *branchJets[3] = {branchJetCHS, branchJetPUPPI, branchGenJet};
+    //TClonesArray *branchJets[3] = {branchJetPUPPI, branchJetCHS, branchGenJet};
+    TClonesArray *branchJets[2] = {branchJetPUPPI, branchGenJet};
 
     Long64_t allEntries = treeReader->GetEntries();
 
@@ -119,12 +120,15 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     Long64_t entry;
 
     Bool_t debug=false;
-    Bool_t do_JEC = true;
+    Bool_t do_JEC = false;
 
-    string jecfile = "/afs/cern.ch/user/a/aalbrech/Delphes/macros_timing/PUPPI_JEC_"+etamax+".txt";
+    string jecfile_CHS = "/afs/cern.ch/user/a/aalbrech/Delphes/macros_timing/CHS_JEC_PUPPI_"+etamax+".txt";
+    string jecfile_PUPPI = "/afs/cern.ch/user/a/aalbrech/Delphes/macros_timing/PUPPI_JEC_PUPPI_"+etamax+".txt";
+
+    string jecfile;
 
     // Loop over all events
-    for(entry = 0; entry < 1; ++entry)
+    for(entry = 0; entry < allEntries; ++entry)
     {
       cout << "Process event " << entry+1 << " of total " << allEntries << endl;
       if(debug){cout << "-------- begin event ---------"<< endl;}
@@ -134,12 +138,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
       if(debug){cout << "-------- begin analyse genparticles ---------"<< endl;}
 
       // efficiency plots
-      if(branchJets[2]->GetEntriesFast() > 0) // genjets
+      if(branchJets[nbranches-1]->GetEntriesFast() > 0) // genjets
       {
         Jet* jet;
         matched = false;
-        for (size_t k = 0; k < branchJets[2]->GetEntriesFast(); k++) {
-          jet = (Jet*) branchJets[2]->At(k);
+        for (size_t k = 0; k < branchJets[nbranches-1]->GetEntriesFast(); k++) {
+          jet = (Jet*) branchJets[nbranches-1]->At(k);
           Int_t eta_index;
           if(jet->PT>20){
           if (abs(jet->Eta) < 1.3) {eta_index=1;};
@@ -152,8 +156,14 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           plots->fGenJetPT[eta_index]->Fill(jet->PT);
           // now match to reco jet ( CHS or PUPPI )
           for (size_t m = 0; m < 2; m++) {
+            if (m==0) {
+              jecfile = jecfile_CHS;
+            }
+            else{
+              jecfile = jecfile_PUPPI;
+            }
             // apply SF on reco jets (stored in jecfile)
-            matched = matched_to_jet(branchJets[m], jet, 0.4, 10, do_JEC, jecfile); // is there a close recojet?
+            matched = matched_to_recojet(branchJets[m], jet, 0.4, 10, branchJets[nbranches-1], do_JEC, jecfile); // is there a close recojet?
             if (matched) {
               plots->fmatchedGenJetPT[m][0]->Fill(jet->PT);
               plots->fmatchedGenJetPT[m][eta_index]->Fill(jet->PT);
@@ -165,6 +175,12 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
     // --------Analyse reco jets for purity -- 0 CHS, 1 PUPPI ---------
     for (Int_t m = 0; m < nbranches-1; m++) {
+      if (m==0) {
+        jecfile = jecfile_CHS;
+      }
+      else{
+        jecfile = jecfile_PUPPI;
+      }
       if(branchJets[m]->GetEntriesFast() > 0) // reco
       {
         Jet* jet;
@@ -176,9 +192,11 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 
           // get jet pt, SF, store corrected_pt
           Double_t reco_pt = jet->PT;
-          Double_t sf = get_SF(jet, jecfile);
-          Double_t corrected_pt = reco_pt*sf;
-          if (do_JEC) {reco_pt = corrected_pt;}
+          Double_t sf;
+          if (do_JEC) {
+            sf = get_SF(jet, branchJets[nbranches-1], jecfile);
+            reco_pt = reco_pt*sf;
+          }
 
           if(reco_pt>20){
           if (abs(jet->Eta) < 1.3) {eta_index=1;};
@@ -190,9 +208,10 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
           plots->fRecoJetPT[m][0]->Fill(reco_pt);
           plots->fRecoJetPT[m][eta_index]->Fill(reco_pt);
           // now match to gen jet
-          matched = matched_to_jet(branchJets[2], jet, 0.4, 10); // is there a close genjet?
+          matched = matched_to_jet(branchJets[nbranches-1], jet, 0.4, 10); // is there a close genjet?
             if (matched) {
-              genjet = get_closest_jet(branchJets[2], jet, 0.4);
+              genjet = get_closest_jet(branchJets[nbranches-1], jet, 0.4);
+
               plots->fmatchedRecoJetPT[m][0]->Fill(reco_pt);
               plots->fmatchedRecoJetPT[m][eta_index]->Fill(reco_pt);
 
@@ -208,6 +227,8 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
               if (abs(genjet->PT) > 50 && abs(genjet->PT) < 80) {pt_index=4;};
               if (abs(genjet->PT) > 80 && abs(genjet->PT) < 100) {pt_index=5;};
               if (abs(genjet->PT) > 100) {pt_index=6;};
+
+              if (debug) {cout << " Fill response plot: reco pt = " << reco_pt << endl;}
 
               plots->fmatchedRecoJetResponse[m][0][0]->Fill(reco_pt/genjet->PT);
               plots->fmatchedRecoJetResponse[m][0][pt_index]->Fill(reco_pt/genjet->PT);

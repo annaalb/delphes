@@ -24,7 +24,7 @@ void comparison_plots_tracks()
   //TString name[6] = {"eflowTrack", "RecoPUTrack", "track_merger", "smeared_track", "CHSeflow", "PUPPIeflow"};
   TString IsPU[3] = {"_signal", "_PU", "_inclusive"};
   TString variable[2] = {"track_dz_smeared_all", "track_dt_smeared_all"};
-  TString variablenames[2] = { "track dZ [m]", "track dT [ns]"};
+  TString variablenames[2] = { "track dz [m]", "track dt [ns]"};
 
   // get the histograms
   //for (size_t i = 0; i < 6; i++) {
@@ -33,9 +33,9 @@ void comparison_plots_tracks()
     track_PU[l] = ((TH1F*)f->Get(variable[l]+IsPU[1]));
 
     track_signal[l]->SetLineColor(kRed);
-  //  track_signal[l]->Scale(1/track_signal[l]->Integral());
+    track_signal[l]->Scale(1/track_signal[l]->Integral());
     track_PU[l]->SetLineColor(kBlue);
-    //track_PU[l]->Scale((1/track_PU[l]->Integral()));
+    track_PU[l]->Scale((1/track_PU[l]->Integral()));
 
   track_signal[l]->Draw("H");
   track_PU[l]->Draw("H same");
@@ -44,10 +44,10 @@ void comparison_plots_tracks()
   canvas->Update();
   stats = (TPaveStats*)track_signal[l]->GetListOfFunctions()->FindObject("stats");
   stats->SetName("h1stats");
-  stats->SetY1NDC(.75);
-  stats->SetY2NDC(.85);
-  stats->SetX1NDC(.6);
-  stats->SetX2NDC(.85);
+  stats->SetY1NDC(.7);
+  stats->SetY2NDC(.8);
+  stats->SetX1NDC(.65);
+  stats->SetX2NDC(.9);
   stats->SetTextColor(2);
   stats->SetTextSize(0.03);
   stats->SetBorderSize(0);
@@ -55,10 +55,10 @@ void comparison_plots_tracks()
   canvas->Update();
   stats2 = (TPaveStats*)track_PU[l]->GetListOfFunctions()->FindObject("stats");
    stats2->SetName("h1stats2");
-   stats2->SetY1NDC(.65);
-   stats2->SetY2NDC(.75);
-   stats2->SetX1NDC(.6);
-   stats2->SetX2NDC(.85);
+   stats2->SetY1NDC(.6);
+   stats2->SetY2NDC(.7);
+   stats2->SetX1NDC(.65);
+   stats2->SetX2NDC(.9);
    stats2->SetTextColor(4);
    stats2->SetTextSize(0.03);
    stats2->SetBorderSize(0);
@@ -73,8 +73,10 @@ void comparison_plots_tracks()
 
    track_signal[l]->GetXaxis()->SetTitle(variablenames[l]);
    track_signal[l]->GetYaxis()->SetTitleOffset(2);
-   track_signal[l]->GetYaxis()->SetTitle("number of tracks");
+   track_signal[l]->GetYaxis()->SetTitle("fraction of tracks");
 
+   relPosX    = 0.045;
+   CMS_lumi(canvas, 0, 10);
   // legend
   auto legend = new TLegend(0.25, 0.7, 0.55, 0.85);
   legend->SetTextSize(.04);
@@ -85,9 +87,9 @@ void comparison_plots_tracks()
 
   //legend->Draw();
   // save output
-  TString outdir = "PLOTS/10kevents/track_vertex_association/";
-  canvas->SaveAs(outdir +variable[l]+ ".pdf");
-  canvas->SaveAs(outdir +variable[l]+ ".root");
+  TString outdir = "PLOTS/study_timing_cut/tracks/";
+  canvas->SaveAs(outdir +variable[l]+ "_norm.pdf");
+  canvas->SaveAs(outdir +variable[l]+ "_norm.root");
 
 } // end variables
 //} // end track branches
