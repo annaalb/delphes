@@ -1,4 +1,4 @@
-
+set EtaMax { 0}
 ########################################
 #  from https://github.com/recotoolsbenchmarks/DelphesNtuplizer/blob/master/cards/CMS_PhaseII_200PU_Snowmass2021_v0.tcl
 #
@@ -169,8 +169,8 @@ module PileUpMerger PileUpMerger {
   set VertexOutputArray vertices
 
   # pre-generated minbias input file
-  #set PileUpFile /eos/cms/store/group/upgrade/delphes/PhaseII/MinBias_100k.pileup
-  set PileUpFile MinBias.pileup
+  set PileUpFile MinBias_100k.pileup
+  #set PileUpFile MinBias.pileup
 
   # average expected pile up
   set MeanPileUp 200
@@ -793,7 +793,7 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
 
   # after track smearing is applied, assume fix dt cut given in 0.1 ns = 100 ps = 100 E-12 s
   set TVertexResolution { 100E-12}
-  set EtaMax { 3}
+  set EtaMax { 0}
 
  }
 
@@ -1037,7 +1037,7 @@ module FastJetFinder GenJetFinder {
   set JetAlgorithm 6
   set ParameterR 0.4
 
-  set JetPTMin 15.0
+  set JetPTMin 10.0
 }
 
 module FastJetFinder GenJetFinderPU {
@@ -1120,7 +1120,7 @@ module FastJetFinder FastJetFinderPF {
   set JetAlgorithm 6
   set ParameterR 0.4
 
-  set JetPTMin 15.0
+  set JetPTMin 10.0
 }
 
 ##############
@@ -1141,7 +1141,7 @@ module FastJetFinder FastJetFinderCHS {
   set JetAlgorithm 6
   set ParameterR 0.4
 
-  set JetPTMin 15.0
+  set JetPTMin 10.0
 }
 
 ###########################
@@ -1154,7 +1154,7 @@ module JetPileUpSubtractor JetPileUpSubtractor {
 
   set OutputArray jets
 
-  set JetPTMin 15.0
+  set JetPTMin 10.0
 }
 
 module FastJetFinder FastJetFinderPUPPI {
@@ -1167,7 +1167,7 @@ module FastJetFinder FastJetFinderPUPPI {
   set JetAlgorithm 6
   set ParameterR 0.4
 
-  set JetPTMin 15.0
+  set JetPTMin 10.0
 }
 
 
