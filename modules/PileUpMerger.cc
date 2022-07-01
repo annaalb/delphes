@@ -92,6 +92,7 @@ void PileUpMerger::Init()
   fReader = new DelphesPileUpReader(fileName);
 
   // import input array
+  // TODO put all Particles
   fInputArray = ImportArray(GetString("InputArray", "Delphes/stableParticles"));
   fItInputArray = fInputArray->MakeIterator();
 
@@ -132,6 +133,7 @@ void PileUpMerger::Process()
   fFunction->GetRandom2(dz, dt);
 
   dz0 = -1.0e6;
+  //std::cout << "dz0 = "<< dz0 << '\n';
   dt0 = -1.0e6;
 
   dt *= c_light * 1.0E3; // necessary in order to make t in mm/c
@@ -154,18 +156,33 @@ void PileUpMerger::Process()
     vx += candidate->Position.X();
     vy += candidate->Position.Y();
     z = candidate->Position.Z();
+    double r = TMath::Sqrt(candidate->Position.X()*candidate->Position.X()+candidate->Position.Y()*candidate->Position.Y());
     t = candidate->Position.T();
     pt = candidate->Momentum.Pt();
 
     // take postion and time from first stable particle
-    if(dz0 < -999999.0)
+    //std::cout << "dz0 bebore = "<< dz0 << '\n';
+    if(dz0 < -999999.0){
+    //  std::cout << "dz0 = z " << '\n';
       dz0 = z;
+    }
+
     if(dt0 < -999999.0)
       dt0 = t;
 
     // cancel any possible offset in position and time the input file
     candidate->Position.SetZ(z - dz0 + dz);
     candidate->Position.SetT(t - dt0 + dt);
+
+    // std::cout << "---- Pile UP Merger ------" << '\n';
+    // std::cout << "final Z = " << z - dz0 + dz << '\n';
+    // std::cout << "z = " << z << '\n';
+    // std::cout << "dz0 = " << dz0 << '\n';
+    // std::cout << "dz = " << dz << '\n';
+    // std::cout << "PID = " << candidate->PID << '\n';
+    // std::cout << "pt = " << pt << '\n';
+    // std::cout << "eta = " << candidate->Momentum.Eta() << '\n';
+    // std::cout << "r = " << r << '\n';
 
     candidate->IsPU = 0;
 
@@ -253,7 +270,7 @@ void PileUpMerger::Process()
       candidate->Mass = pdgParticle ? pdgParticle->Mass() : -999.9;
 
       candidate->IsPU = 1;
-      
+
       fPUParticleOutputArray->Add(candidate);
 
       candidate->Momentum.SetPxPyPzE(px, py, pz, e);

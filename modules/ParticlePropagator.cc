@@ -289,6 +289,10 @@ void ParticlePropagator::Process()
       yd = y_c + r * TMath::Cos(phid);
       zd = z + vz * td;
 
+      // z = particlePosition.Z() * 1.0E-3;
+      // vz velocity
+
+
       // momentum at closest approach
       px = pt * TMath::Cos(phid);
       py = pt * TMath::Sin(phid);
@@ -298,6 +302,18 @@ void ParticlePropagator::Process()
       // calculate additional track parameters (correct for beamspot position)
       d0 = ((xd - bsx) * py - (yd - bsy) * px) / pt;
       dz = zd - bsz;
+      if (!candidate->IsPU) {
+        // std::cout << "--------- Particle Propagator -----------" << '\n';
+        // std::cout << "z = "<<z << '\n';
+        // std::cout << "vz = "<<vz << '\n';
+        // std::cout << "td = "<<td << '\n';
+        //
+        // std::cout << "dz = "<<dz << '\n';
+        // std::cout << "zd = "<<zd << '\n';
+        //
+        // std::cout << "bsz = "<<bsz << '\n';
+
+      }
       ctgTheta = 1.0 / TMath::Tan(particleMomentum.Theta());
 
       // 3. time evaluation t = TMath::Min(t_r, t_z)

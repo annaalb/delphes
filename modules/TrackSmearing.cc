@@ -310,7 +310,19 @@ void TrackSmearing::Process()
     if(fApplyToPileUp || !candidate->IsPU)
     {
       d0 = gRandom->Gaus(d0, d0Error);
+      if (!(candidate->IsPU)) {
+        // cout << "------ Track Smearing -------" << endl;
+        // cout << "pt = " << pt << endl;
+        // cout << "eta = " << eta << endl;
+        //
+        // cout << "Before smearing dz = " << dz << endl;
+            }
+
       dz = gRandom->Gaus(dz, dzError);
+      if (!(candidate->IsPU)) {
+
+    //  cout << "After smearing dz = " << dz << endl;
+    }
       p = gRandom->Gaus(p, pError);
       ctgTheta = gRandom->Gaus(ctgTheta, ctgThetaError);
       phi = gRandom->Gaus(phi, phiError);

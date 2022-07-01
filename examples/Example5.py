@@ -9,7 +9,7 @@ import array
 
 
 if len(sys.argv) < 2:
-  print " Usage: Example1.py input_file"
+  print (" Usage: Example1.py input_file")
   sys.exit(1)
 
 ROOT.gSystem.Load("libDelphes")
@@ -39,7 +39,7 @@ branchParticle   = treeReader.UseBranch("Particle")
 hStatus            = ROOT.TH1F("hStatus", "hStatus",  101, -0.5,  100.5)
 
 debug = True
-if debug: numberOfEntries = 10
+if debug: numberOfEntries = 1
 
 
 # Loop over all events
@@ -48,20 +48,21 @@ for entry in range(0, numberOfEntries):
     treeReader.ReadEntry(entry)
 
     if (entry+1)%100 == 0:
-       print ' ... processed {} events ...'.format(entry+1)
+       print (' ... processed {} events ...'.format(entry+1))
     i=0
 
-    print '---------------------------------------------------------------------------------------'
-    print ''
+    print ('---------------------------------------------------------------------------------------')
+    print ('')
 
 
     for gen in branchParticle:
+        r = math.sqrt(gen.X**2+gen.Y**2);
+        print ("N: ", i, ", St: ", gen.Status,", PID: ",gen.PID,", E: ",gen.E,", PT: ",gen.PT,", Eta: ",gen.Eta,", M: ",gen.Mass,", M1: ",gen.M1,", M2: ",gen.M2,", D1: ",gen.D1,", D2: ",gen.D2, " r: ", r, " Z: ", gen.Z)
         i +=1
-        print "N: ", i, ", St: ", gen.Status,", PID: ",gen.PID,", E: ",gen.E,", PT: ",gen.PT,", Eta: ",gen.Eta,", M: ",gen.Mass,", M1: ",gen.M1,", M2: ",gen.M2,", D1: ",gen.D1,", D2: ",gen.D2        
 
         hStatus.Fill(gen.Status)
 
 # Show resulting histograms
 out_root = ROOT.TFile(outputFile,"RECREATE")
- 
+
 hStatus.Write()
