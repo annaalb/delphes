@@ -92,7 +92,7 @@ Double_t DelphesFormula::Eval(Double_t pt, Double_t eta, Double_t phi, Double_t 
   }
 
   Double_t x[4] = {pt, eta, phi, energy};
-  Double_t params[5] = {d0, dz, ctgTheta, radius, density}; //TODO no candidate given -> this means that here all parameters are set to ´zero -> is this correct? What is d0, dz?
+  Double_t params[5] = {d0, dz, ctgTheta, radius, density};
   return EvalPar(x, params);
 }
 
