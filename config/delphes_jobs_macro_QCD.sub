@@ -1,6 +1,6 @@
-executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/submit_files/for_macros/submit_card_$(ProcId).sh
+executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/submit_files/for_macros/submit_macro_QCD_test_$(ProcId).sh
 output = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/submit_card_$(ClusterId)_$(ProcId).out
 error = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/submit_card_$(ClusterId)_$(ProcId).err
 log = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/submit_card_$(ClusterId).log
-+JobFlavour = "longlunch"
-queue 3
++JobFlavour = "microcentury"
+queue 1

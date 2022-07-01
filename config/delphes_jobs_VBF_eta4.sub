@@ -1,6 +1,6 @@
-executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/submit_files/VBF/EtaMax0/submit_card_$(ProcId).sh
+executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/submit_files/VBF/EtaMax3/submit_card_$(ProcId).sh
 output = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/VBF/submit_card_$(ClusterId)_$(ProcId).out
 error = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/VBF/submit_card_$(ClusterId)_$(ProcId).err
 log = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/VBF/submit_card_$(ClusterId).log
 +JobFlavour = "microcentury"
-queue 1
+queue 10
