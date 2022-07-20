@@ -224,8 +224,7 @@ void TrackPileUpSubtractor::Process()
       // handle two eta regions:
       // 1. (eta > etaMax) keep tracks if dz < x
       // 2. (eta < etaMax) keep tracks if dz < x and dt < y
-      // TODO include dt
-      else if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller)) ) // include also signal track rejection // default Eta max = 0 (only dz cut)
+      else if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) ) // include also signal track rejection // default Eta max = 0 (only dz cut)
       {
         if (_debug && !(candidate->IsPU)) {
              std::cout << "******************************** IsRecoPU = 0 ******************************" << '\n';
@@ -241,11 +240,11 @@ void TrackPileUpSubtractor::Process()
       else{
         candidate->IsRecoPU = 1; // tracks that are rejected
         // plot for rejected signal tracks
-        if (!candidate->IsPU) {
-          double r = TMath::Sqrt(candidate->Position.X()*candidate->Position.X()+candidate->Position.Y()*candidate->Position.Y());
-          if(r > 1200) candidate->IsRecoPU =0;
-          // cout << ", St: "<< candidate->Status<<", PID: "<<candidate->PID<<", E: "<<candidate->Momentum.E()<<", PT: "<<candidate->PT<<", Eta: "<<candidate->Momentum.Eta()<<", M: "<<candidate->Mass<<", M1: "<<candidate->M1<<", M2: "<<candidate->M2<<", D1: "<<candidate->D1<<", D2: "<<candidate->D2<<" r: "<<r<< " Z: "<< candidate->Position.Z() << endl;
-        }
+        // if (!candidate->IsPU) {
+        //   double r = TMath::Sqrt(candidate->Position.X()*candidate->Position.X()+candidate->Position.Y()*candidate->Position.Y());
+        //   if(r > 1200) candidate->IsRecoPU =0;
+        //   // cout << ", St: "<< candidate->Status<<", PID: "<<candidate->PID<<", E: "<<candidate->Momentum.E()<<", PT: "<<candidate->PT<<", Eta: "<<candidate->Momentum.Eta()<<", M: "<<candidate->Mass<<", M1: "<<candidate->M1<<", M2: "<<candidate->M2<<", D1: "<<candidate->D1<<", D2: "<<candidate->D2<<" r: "<<r<< " Z: "<< candidate->Position.Z() << endl;
+        // }
 
       }
 
