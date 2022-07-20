@@ -14,7 +14,7 @@
 #######################################
 
 set SkipEvents 0
-set MaxEvents 1000
+set MaxEvents 10
 
 set ExecutionPath {
 
