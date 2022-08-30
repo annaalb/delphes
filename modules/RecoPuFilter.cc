@@ -77,6 +77,7 @@ void RecoPuFilter::Init()
 
   // create output array
   fOutputArray = ExportArray(GetString("OutputArray", "filteredParticles"));
+  fEtaMax = GetDouble("EtaMax", 0.);
 }
 
 //------------------------------------------------------------------------------
@@ -98,7 +99,13 @@ void RecoPuFilter::Process()
   fItInputArray->Reset();
   while((candidate = static_cast<Candidate *>(fItInputArray->Next())))
   {
-    if(candidate->IsRecoPU) continue;
+    if (fEtaMax == 0) {
+      if(candidate->IsRecoPU) continue;
+    }
+    else if (fEtaMax == 3) {
+      if(candidate->IsRecoPU_EtaMax3) continue;
+    }
+    //if(candidate->IsRecoPU) continue;
     fOutputArray->Add(candidate);
   }
 }

@@ -209,7 +209,8 @@ TMatrixDSym ParticleFlowCandidate::CovarianceMatrix() const
 Candidate::Candidate() :
   PID(0), Status(0), M1(-1), M2(-1), D1(-1), D2(-1),
   Charge(0), Mass(0.0),
-  IsPU(0), IsRecoPU(0), IsConstituent(0), IsFromConversion(0),
+  IsPU(0), IsRecoPU(0), IsRecoPU_EtaMax3(0),
+  IsConstituent(0), IsFromConversion(0),
   Flavor(0), FlavorAlgo(0), FlavorPhys(0),
   BTag(0), BTagAlgo(0), BTagPhys(0),
   TauTag(0), TauWeight(0.0), Eem(0.0), Ehad(0.0),
@@ -358,6 +359,7 @@ void Candidate::Copy(TObject &obj) const
   object.Mass = Mass;
   object.IsPU = IsPU;
   object.IsRecoPU = IsRecoPU;
+  object.IsRecoPU_EtaMax3 = IsRecoPU_EtaMax3;
   object.IsConstituent = IsConstituent;
   object.IsFromConversion = IsFromConversion;
   object.ClusterIndex = ClusterIndex;
@@ -499,6 +501,7 @@ void Candidate::Clear(Option_t *option)
   Mass = 0.0;
   IsPU = 0;
   IsRecoPU = 0;
+  IsRecoPU_EtaMax3 = 0;
   IsConstituent = 0;
   IsFromConversion = 0;
   Flavor = 0;

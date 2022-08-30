@@ -656,6 +656,7 @@ public:
 
   Int_t IsPU;
   Int_t IsRecoPU;
+  Int_t IsRecoPU_EtaMax3;
 
   Int_t IsConstituent;
   Int_t IsFromConversion;

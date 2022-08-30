@@ -52,6 +52,7 @@ private:
   const TObjArray *fInputArray; //!
 
   TObjArray *fOutputArray; //!
+  Double_t fEtaMax;
 
   ClassDef(RecoPuFilter, 1)
 };

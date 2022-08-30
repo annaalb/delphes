@@ -1,6 +1,0 @@
-executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/hello_$(ProcId).sh
-output = /afs/cern.ch/user/a/aalbrech/Delphes/config/test_submit/test_$(ClusterId)_$(ProcId).out
-error = /afs/cern.ch/user/a/aalbrech/Delphes/config/test_submit/test_$(ClusterId)_$(ProcId).err
-log = /afs/cern.ch/user/a/aalbrech/Delphes/config/test_submit/test_$(ClusterId).log
-+JobFlavour = "espresso"
-queue 1

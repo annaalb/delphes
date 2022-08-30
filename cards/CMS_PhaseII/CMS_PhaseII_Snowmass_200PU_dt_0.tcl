@@ -14,7 +14,7 @@
 #######################################
 
 set SkipEvents 0
-set MaxEvents 10
+set MaxEvents 1
 
 set ExecutionPath {
 
@@ -46,6 +46,7 @@ set ExecutionPath {
 
   TrackPileUpSubtractor
   RecoPuFilter
+  RecoPuFilter_EtaMax3
 
   TowerMerger
   NeutralEFlowMerger
@@ -57,8 +58,11 @@ set ExecutionPath {
   LeptonFilterNoLep
   LeptonFilterLep
   RunPUPPIBase
+  RunPUPPIBase_EtaMax3
   RunPUPPIMerger
+  RunPUPPIMerger_EtaMax3
   RunPUPPI
+  RunPUPPI_EtaMax3
 
   EFlowFilterPuppi
   EFlowFilterCHS
@@ -110,13 +114,16 @@ set ExecutionPath {
   JetPileUpSubtractor
 
   FastJetFinderPUPPI
+  FastJetFinderPUPPI_EtaMax3
   FastJetFinderPUPPIAK8
 
   JetScaleCHS
   JetScalePUPPI
+  JetScalePUPPI_EtaMax3
   JetScalePUPPIAK8
   JetSmearCHS
   JetSmearPUPPI
+  JetSmearPUPPI_EtaMax3
   JetSmearPUPPIAK8
 
   JetFlavorAssociationPUPPI
@@ -794,7 +801,6 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
   # after track smearing is applied, assume fix dt cut given in 0.1 ns = 100 ps = 100 E-12 s
   set TVertexResolution { 100E-12}
   set EtaMax { 0}
-
  }
 
 ########################
@@ -804,6 +810,13 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
 module RecoPuFilter RecoPuFilter {
   set InputArray HCal/eflowTracks
   set OutputArray eflowTracks
+  set EtaMax { 0}
+}
+
+module RecoPuFilter RecoPuFilter_EtaMax3 {
+  set InputArray HCal/eflowTracks
+  set OutputArray eflowTracks
+  set EtaMax { 3}
 }
 
 ###################################################
@@ -907,8 +920,44 @@ module RunPUPPI RunPUPPIBase {
   set OutputArrayNeutrals puppiNeutrals
 }
 
+module RunPUPPI RunPUPPIBase_EtaMax3 {
+  ## input information
+  set TrackInputArray   LeptonFilterNoLep/eflowTracksNoLeptons
+  set NeutralInputArray NeutralEFlowMerger/eflowTowers
+  set PVInputArray      PileUpMerger/vertices
+  set MinPuppiWeight    0.05
+  set UseExp            false
+  set UseNoLep          false
+
+  ## define puppi algorithm parameters (more than one for the same eta region is possible)
+  add EtaMinBin           0.0   1.5   4.0
+  add EtaMaxBin           1.5   4.0   10.0
+  add PtMinBin            0.0   0.0   0.0
+  add ConeSizeBin         0.2   0.2   0.2
+  add RMSPtMinBin         0.1   0.5   0.5
+  add RMSScaleFactorBin   1.0   1.0   1.0
+  add NeutralMinEBin      0.2   0.2   0.5
+  add NeutralPtSlope      0.006 0.013 0.067
+  add ApplyCHS            true  true  true
+  add UseCharged          true  true  false
+  add ApplyLowPUCorr      true  true  true
+  add MetricId            5     5     5
+  add CombId              0     0     0
+
+  ## output name
+  set OutputArray         PuppiParticles
+  set OutputArrayTracks   puppiTracks
+  set OutputArrayNeutrals puppiNeutrals
+}
+
 module Merger RunPUPPIMerger {
   add InputArray RunPUPPIBase/PuppiParticles
+  add InputArray LeptonFilterLep/eflowTracksLeptons
+  set OutputArray PuppiParticles
+}
+
+module Merger RunPUPPIMerger_EtaMax3 {
+  add InputArray RunPUPPIBase_EtaMax3/PuppiParticles
   add InputArray LeptonFilterLep/eflowTracksLeptons
   set OutputArray PuppiParticles
 }
@@ -916,6 +965,11 @@ module Merger RunPUPPIMerger {
 # need this because of leptons that were added back
 module RecoPuFilter RunPUPPI {
   set InputArray RunPUPPIMerger/PuppiParticles
+  set OutputArray PuppiParticles
+}
+
+module RecoPuFilter RunPUPPI_EtaMax3 {
+  set InputArray RunPUPPIMerger_EtaMax3/PuppiParticles
   set OutputArray PuppiParticles
 }
 
@@ -1170,6 +1224,19 @@ module FastJetFinder FastJetFinderPUPPI {
   set JetPTMin 10.0
 }
 
+module FastJetFinder FastJetFinderPUPPI_EtaMax3 {
+#  set InputArray TowerMerger/towers
+  set InputArray RunPUPPI_EtaMax3/PuppiParticles
+
+  set OutputArray jets
+
+  # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
+  set JetAlgorithm 6
+  set ParameterR 0.4
+
+  set JetPTMin 10.0
+}
+
 
 module FastJetFinder FastJetFinderPUPPIAK8 {
 #  set InputArray TowerMerger/towers
@@ -1306,6 +1373,58 @@ module EnergyScale JetScalePUPPI {
   }
 
 }
+
+module EnergyScale JetScalePUPPI_EtaMax3 {
+  set InputArray FastJetFinderPUPPI_EtaMax3/jets
+  set OutputArray jets
+
+ # scale formula for jets
+    ### jetpuppi tightID momentum scale
+  set ScaleFormula {
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (1.45) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.953) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.910) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.912) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.930) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.953) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.968) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.983) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.988) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.992) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (1.200) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (1.103) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (1.037) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (1.007) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (1.002) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (1.005) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (1.004) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (1.003) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.997) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.996) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (1.057) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.855) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.776) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.801) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.810) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.860) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.913) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.926) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.963) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (1.971) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (1.465) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (1.213) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (1.054) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.986) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.957) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (1.010) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (1.000) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (1.000) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (1.000)
+  }
+
+}
+
 module EnergyScale JetScalePUPPIAK8 {
   set InputArray FastJetFinderPUPPIAK8/jets
   set OutputArray jets
@@ -1421,6 +1540,58 @@ module MomentumSmearing JetSmearPUPPI {
    (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00)
   }
 }
+
+module MomentumSmearing JetSmearPUPPI_EtaMax3 {
+  set InputArray JetScalePUPPI_EtaMax3/jets
+  set OutputArray jets
+  set UseMomentumVector true
+
+ # scale formula for jets
+   ### jetpuppi tightID momentum resolution
+  set ResolutionFormula {
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 15.0 && pt <= 20.0) * (0.60) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 20.0 && pt <= 30.0) * (0.20) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 30.0 && pt <= 50.0) * (0.10) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 50.0 && pt <= 75.0) * (0.07) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 75.0 && pt <= 100.0) * (0.08) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 100.0 && pt <= 150.0) * (0.15) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 150.0 && pt <= 200.0) * (0.08) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 200.0 && pt <= 500.0) * (0.08) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 500.0 && pt <= 1000.0) * (0.065) +
+   (abs(eta) > 0.0 && abs(eta) <= 1.5) * (pt > 1000.0 && pt <= 14000.0) * (0.04) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 15.0 && pt <= 20.0) * (0.70) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 20.0 && pt <= 30.0) * (0.70) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 30.0 && pt <= 50.0) * (0.35) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 50.0 && pt <= 75.0) * (0.27) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 75.0 && pt <= 100.0) * (0.30) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 100.0 && pt <= 150.0) * (0.28) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 150.0 && pt <= 200.0) * (0.22) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 200.0 && pt <= 500.0) * (0.16) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 500.0 && pt <= 1000.0) * (0.10) +
+   (abs(eta) > 1.5 && abs(eta) <= 3.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 15.0 && pt <= 20.0) * (0.55) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 20.0 && pt <= 30.0) * (0.47) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 30.0 && pt <= 50.0) * (0.38) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 50.0 && pt <= 75.0) * (0.25) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 75.0 && pt <= 100.0) * (0.26) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 100.0 && pt <= 150.0) * (0.29) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 150.0 && pt <= 200.0) * (0.20) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 200.0 && pt <= 500.0) * (0.18) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 500.0 && pt <= 1000.0) * (0.11) +
+   (abs(eta) > 3.0 && abs(eta) <= 4.0) * (pt > 1000.0 && pt <= 14000.0) * (0.05) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 15.0 && pt <= 20.0) * (0.50) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 20.0 && pt <= 30.0) * (0.25) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 30.0 && pt <= 50.0) * (0.19) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 50.0 && pt <= 75.0) * (0.19) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 75.0 && pt <= 100.0) * (0.08) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 100.0 && pt <= 150.0) * (0.04) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 150.0 && pt <= 200.0) * (0.00) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 200.0 && pt <= 500.0) * (0.00) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 500.0 && pt <= 1000.0) * (0.00) +
+   (abs(eta) > 4.0 && abs(eta) <= 5.0) * (pt > 1000.0 && pt <= 14000.0) * (0.00)
+  }
+}
+
 
 module MomentumSmearing JetSmearPUPPIAK8 {
   set InputArray JetScalePUPPIAK8/jets
@@ -7592,9 +7763,7 @@ module TreeWriter TreeWriter {
   add Branch EFlowMergerPF/eflow ParticleFlowCandidatePF ParticleFlowCandidate
   add Branch EFlowMerger/eflow ParticleFlowCandidateCHS ParticleFlowCandidate
   add Branch RunPUPPI/PuppiParticles ParticleFlowCandidate ParticleFlowCandidate
-
-  #add Branch RunPUPPIBase/puppiTracks PuppiTrack Track
-  #add Branch RunPUPPIBase/puppiNeutrals PuppiTower Tower
+  add Branch RunPUPPI_EtaMax3/PuppiParticles ParticleFlowCandidate_EtaMax3 ParticleFlowCandidate
 
   add Branch PhotonSmear/photons Photon Photon
   add Branch PhotonFakeMergerLoose/photons PhotonLoose Photon
@@ -7618,6 +7787,8 @@ module TreeWriter TreeWriter {
 
   add Branch JetSmearCHS/jets JetCHS Jet
   add Branch JetSmearPUPPI/jets JetPUPPI Jet
+  add Branch JetSmearPUPPI_EtaMax3/jets JetPUPPI_EtaMax3 Jet
+
   add Branch JetSmearPUPPIAK8/jets JetPUPPIAK8 Jet
 
   add Branch JetLooseID/jets JetPUPPILoose Jet

@@ -4,7 +4,8 @@
 
 #include "Style.C"
 //------------------------------------------------------------------------------
-
+// run with
+// root -l -b -q comparison_plots_VBF_QCD.C
 void comparison_plots_VBF_QCD()
 {
   //SetStyle();
@@ -48,13 +49,14 @@ void comparison_plots_VBF_QCD()
   TString variablenames[7] = {"t (jet - LV) [ns]", "t_{p_{T} weighted} (jet - LV) [ns]" ,"track dz [m]", "track dt [ns]", "Track #eta", "Jet p_{T}", "Jet #eta"};
 
   Int_t k = 0;
+  Int_t e = 0;
 //  Int_t l = 3;
 
   // get the histograms
   for (size_t s = 0; s < 3; s++) { // timing_scenario
   for (size_t i = 1; i < 2; i++) { // CHS or PUPPI
-      for (size_t l = 4; l < 5; l++) {  // variables
-        for (size_t e = 0; e < 5; e++) { // eta bins
+      for (size_t l = 5; l < 7; l++) {  // variables
+        //for (size_t e = 0; e < 5; e++) { // eta bins
         //  for (size_t k = 0; k < 3; k++) { // split tracks into signal / PU
     track_VBF[i][k] = ((TH1F*)f[s]->Get(category[0]+"_"+name[i]+IsPU[k]+variable[l]+eta[e]));
     track_b[i][k] = ((TH1F*)f[s]->Get(category[1]+"_"+name[i]+IsPU[k]+variable[l]+eta[e]));
@@ -158,7 +160,7 @@ void comparison_plots_VBF_QCD()
   canvas->SaveAs(outdir  + name[i]+IsPU[k]+variable[l]+eta[e]+timing_scenario[s]+".pdf");
   //canvas->SaveAs(outdir  + name[i]+IsPU[k]+variable[l]+eta[e]+timing_scenario[s]+".root");
 
-}// end eta bins
+//}// end eta bins
 } // end variables or signal / PU
 } // end jet loop
 } // end timing_scenario

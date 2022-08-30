@@ -1,16 +1,0 @@
-** [----------------------------------------------------------------] (0.00%)WARNING from FastJet: ClusterSequenceActiveAreaExplicitGhosts: 
-  ghosts not sufficiently soft wrt some of the input particles
-  a common cause is (unphysical?) input particles with pt=0 but finite rapidity
-WARNING from FastJet: ClusterSequenceActiveAreaExplicitGhosts: 
-  ghosts not sufficiently soft wrt some of the input particles
-  a common cause is (unphysical?) input particles with pt=0 but finite rapidity
-WARNING from FastJet: ClusterSequenceActiveAreaExplicitGhosts: 
-  ghosts not sufficiently soft wrt some of the input particles
-  a common cause is (unphysical?) input particles with pt=0 but finite rapidity
-WARNING from FastJet: ClusterSequenceActiveAreaExplicitGhosts: 
-  ghosts not sufficiently soft wrt some of the input particles
-  a common cause is (unphysical?) input particles with pt=0 but finite rapidity
-WARNING from FastJet: ClusterSequenceActiveAreaExplicitGhosts: 
-  ghosts not sufficiently soft wrt some of the input particles
-  a common cause is (unphysical?) input particles with pt=0 but finite rapidity (LAST SUCH WARNING)
-** [################################################################] (100.00%)

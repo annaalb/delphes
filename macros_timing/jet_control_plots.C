@@ -38,7 +38,9 @@ class ExRootTreeReader;
 
 void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
 {
-  TString branchJetNames[3] = {"branchJetCHS", "branchJetPUPPI", "branchGenJet"};
+  //TString branchJetNames[3] = {"branchJetCHS", "branchJetPUPPI", "branchGenJet"};
+  TString branchJetNames[3] = {"branchJetPUPPI", "branchJetPUPPI_EtaMax3", "branchGenJet"};
+
   TString name2[2] = {"_signal", "_PU"};
 
   // book more histograms
@@ -76,11 +78,15 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchEFlowCHS2 = treeReader->UseBranch("ParticleFlowCandidateCHS");
 
     TClonesArray *branchPuppiParticle = treeReader->UseBranch("ParticleFlowCandidate");
+    TClonesArray *branchPuppiParticle_EtaMax3 = treeReader->UseBranch("ParticleFlowCandidate_EtaMax3");
+
     //TClonesArray *branchPuppiTrack = treeReader->UseBranch("PuppiTrack");
     //TClonesArray *branchPuppiTower = treeReader->UseBranch("PuppiTower");
 
     TClonesArray *branchJetCHS = treeReader->UseBranch("JetCHS");
     TClonesArray *branchJetPUPPI = treeReader->UseBranch("JetPUPPI");
+    TClonesArray *branchJetPUPPI_EtaMax3 = treeReader->UseBranch("JetPUPPI_EtaMax3");
+
   //  TClonesArray *branchJetConstituentsCHS = treeReader->UseBranch("JetConstituentsCHS"); // jet constituents
 
     TClonesArray *branchParticle = treeReader->UseBranch("Particle"); // for identification of VBF and b quarks
@@ -90,7 +96,7 @@ void BookHistogramsBasic(ExRootResult *result, MyPlots *plots)
     TClonesArray *branchGenJet = treeReader->UseBranch("GenJet");
     TClonesArray *branchVtx = treeReader->UseBranch("Vertex");
 
-    TClonesArray *branchJets[3] = {branchJetCHS, branchJetPUPPI, branchGenJet};
+    TClonesArray *branchJets[3] = {branchJetPUPPI, branchJetPUPPI_EtaMax3, branchGenJet};
 
     Long64_t allEntries = treeReader->GetEntries();
 
@@ -200,7 +206,7 @@ cout << "Book hists "<< endl;
     //Simulation_label();
 cout << "Analyse event "<< endl;
     AnalyseEvents(treeReader, plots);
-    gSystem->cd("PLOTS/10kevents/jet_control_plots/");
+    gSystem->cd("PLOTS/1Card3Collections/jet_control_plots/");
     cout << "Print hists "<< endl;
 
     PrintHistograms(result, plots);

@@ -214,6 +214,7 @@ void TrackPileUpSubtractor::Process()
       Bool_t dz_smaller = (TMath::Abs(z - zvtx) < fFormula->Eval(pt, eta, phi, e) * 1.0e3); // dz = 1mm
       Bool_t dt_smaller = (TMath::Abs(t - tvtx) < fFormulaTime->Eval(pt, eta, phi, e) );
       Bool_t eta_smaller = (TMath::Abs(eta)<fEtaMax);
+      Bool_t eta_smaller_3 = (TMath::Abs(eta)<3);
 
       if (TMath::Abs(eta)>=4) {eta_smaller=false;}
 
@@ -224,30 +225,26 @@ void TrackPileUpSubtractor::Process()
       // handle two eta regions:
       // 1. (eta > etaMax) keep tracks if dz < x
       // 2. (eta < etaMax) keep tracks if dz < x and dt < y
-      else if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) ) // include also signal track rejection // default Eta max = 0 (only dz cut)
-      {
-        if (_debug && !(candidate->IsPU)) {
-             std::cout << "******************************** IsRecoPU = 0 ******************************" << '\n';
-             std::cout << "charged "<< charged << '\n';
-             std::cout << "eta_smaller "<< eta_smaller << '\n';
-             std::cout << "dz_smaller "<< dz_smaller << '\n';
-             std::cout << "dt_smaller "<< dt_smaller << '\n';
 
-           }
+      // CASE 1 no Timing
+      if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) )
+      {
         candidate->IsRecoPU = 0;
         if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
       }
       else{
         candidate->IsRecoPU = 1; // tracks that are rejected
-        // plot for rejected signal tracks
-        // if (!candidate->IsPU) {
-        //   double r = TMath::Sqrt(candidate->Position.X()*candidate->Position.X()+candidate->Position.Y()*candidate->Position.Y());
-        //   if(r > 1200) candidate->IsRecoPU =0;
-        //   // cout << ", St: "<< candidate->Status<<", PID: "<<candidate->PID<<", E: "<<candidate->Momentum.E()<<", PT: "<<candidate->PT<<", Eta: "<<candidate->Momentum.Eta()<<", M: "<<candidate->Mass<<", M1: "<<candidate->M1<<", M2: "<<candidate->M2<<", D1: "<<candidate->D1<<", D2: "<<candidate->D2<<" r: "<<r<< " Z: "<< candidate->Position.Z() << endl;
-        // }
-
       }
-
+      // CASE 2 Timing up to Eta 3
+      if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) )
+    //  if(charged && ((!eta_smaller_3 && dz_smaller) || (eta_smaller_3 && dz_smaller && dt_smaller)) )
+      {
+        candidate->IsRecoPU_EtaMax3 = 0;
+        if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
+      }
+      else{
+        candidate->IsRecoPU_EtaMax3 = 1; // tracks that are rejected
+      }
 
     }
   }
