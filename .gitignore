@@ -36,3 +36,4 @@ ROOTOUTPUT
 /config/log
 PileUp
 PILEUP
+load_delphes_libs*
