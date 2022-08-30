@@ -52,10 +52,9 @@ using namespace std;
 //------------------------------------------------------------------------------
 
 TrackPileUpSubtractor::TrackPileUpSubtractor() :
-  fFormula(0), fFormulaTime(0)
+  fFormula(0)
 {
   fFormula = new DelphesFormula;
-  fFormulaTime = new DelphesFormula;
 }
 
 //------------------------------------------------------------------------------
@@ -63,8 +62,6 @@ TrackPileUpSubtractor::TrackPileUpSubtractor() :
 TrackPileUpSubtractor::~TrackPileUpSubtractor()
 {
   if(fFormula) delete fFormula;
-  if(fFormulaTime) delete fFormulaTime;
-
 }
 
 //------------------------------------------------------------------------------
@@ -78,8 +75,6 @@ void TrackPileUpSubtractor::Init()
 
   // read resolution formula in m
   fFormula->Compile(GetString("ZVertexResolution", "0.001"));
-  fFormulaTime->Compile(GetString("TVertexResolution", "0"));
-  fEtaMax = GetDouble("EtaMax", 0.);
 
   fPTMin = GetDouble("PTMin", 0.);
 
@@ -126,9 +121,7 @@ void TrackPileUpSubtractor::Process()
   TIterator *iterator;
   TObjArray *array;
   Double_t z, zvtx = 0;
-  Double_t t, tvtx = 0;
   Double_t pt, eta, phi, e;
-  const Double_t c_light = 2.99792458E8;
 
   // find z position of primary vertex
 
@@ -138,7 +131,6 @@ void TrackPileUpSubtractor::Process()
     if(!candidate->IsPU)
     {
       zvtx = candidate->Position.Z();
-      tvtx = candidate->Position.T() * 1.0E-3 / c_light;
       // break;
     }
   }
@@ -161,91 +153,29 @@ void TrackPileUpSubtractor::Process()
       phi = candidateMomentum.Phi();
       e = candidateMomentum.E();
 
-      // original module
-    //   z = particle->Position.Z();
-    //
-    //   // apply pile-up subtraction
-    //   // assume perfect pile-up subtraction for tracks outside fZVertexResolution
-    //
-    // //  if(candidate->Charge != 0 && candidate->IsPU && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
-    //   if(candidate->Charge != 0 && TMath::Abs(z - zvtx) > fFormula->Eval(pt, eta, phi, e) * 1.0e3)
-    //   {
-    //     candidate->IsRecoPU = 1;
-    //   }
-    //   else
-    //   {
-    //     candidate->IsRecoPU = 0;
-    //     if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
-    //   }
-
-
-      /// New part !
-      Bool_t _debug=false;
-
+      //      z = particle->Position.Z();
       z = candidate->InitialPosition.Z();
-    //  dz = candidate->DZ(); // take dz
-      t = candidate->InitialPosition.T()* 1.0E-3 / c_light; // time in s
 
       // apply pile-up subtraction
       // assume perfect pile-up subtraction for tracks outside fZVertexResolution
-      if (_debug && candidate->Charge != 0 && !(candidate->IsPU)) {
-        std::cout << "TVertex Resolution "<< GetString("TVertexResolution", "0") << '\n';
-        std::cout << "---- Module TrackPileUpSubtractor ----" << '\n';
-        std::cout << "z = "<<z << '\n';
-        std::cout << "zvtx = " << zvtx << '\n';
-        std::cout << "dz = " << candidate->DZ << '\n';
-        std::cout << "abs(z - zvtx) = "<<TMath::Abs(z - zvtx) << '\n';
-        std::cout << "fFormula->Eval(pt, eta, phi, e) * 1.0e3 = "<< fFormula->Eval(pt, eta, phi, e) * 1.0e3 << '\n';
-        std::cout << "t = "<<t << '\n';
-        std::cout << "tvtx = " << tvtx << '\n';
-        std::cout << "abs(t - tvtx) = "<<TMath::Abs(t - tvtx) << '\n';
-        std::cout << "fFormulaTime->Eval(pt, eta, phi, e) = "<< fFormulaTime->Eval(pt, eta, phi, e) << '\n';
-        std::cout << "candidate->Momentum.Eta() = " << candidate->Momentum.Eta() << '\n';
-        std::cout << "eta = candidate->particle->momentum.Eta() = "<< eta << '\n';
-        std::cout << "EtaMax = " << fEtaMax << '\n';
-        std::cout << "Eta diff = " << (TMath::Abs(eta)-fEtaMax) << '\n';
+
+      if(candidate->Charge != 0 && TMath::Abs(z - zvtx) > 0.003 * 1.0e3)
+      {
+	candidate->IsRecoPU = 1;	
+	if (TMath::Abs(candidate->PID) == 211 || TMath::Abs(candidate->PID) == 2212 || TMath::Abs(candidate->PID) == 11 || TMath::Abs(candidate->PID) == 13){
+	  if (TMath::Abs(particle->Position.Z() - zvtx)<10) {
+	    candidate->IsRecoPU = 0;
+	    if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
+	  }
+	}
+	
+	
       }
-
-
-
-      Bool_t charged = (candidate->Charge != 0);
-    //  Bool_t dz_smaller = (TMath::Abs(candidate->DZ)) < 1; // 1 mm
-
-      Bool_t dz_smaller = (TMath::Abs(z - zvtx) < fFormula->Eval(pt, eta, phi, e) * 1.0e3); // dz = 1mm
-      Bool_t dt_smaller = (TMath::Abs(t - tvtx) < fFormulaTime->Eval(pt, eta, phi, e) );
-      Bool_t eta_smaller = (TMath::Abs(eta)<fEtaMax);
-      Bool_t eta_smaller_3 = (TMath::Abs(eta)<3);
-
-      if (TMath::Abs(eta)>=4) {eta_smaller=false;}
-
-      // if (!(candidate->IsPU)){ // keep all signal tracks
-      //   candidate->IsRecoPU = 0;
-      //   if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
-      // }
-      // handle two eta regions:
-      // 1. (eta > etaMax) keep tracks if dz < x
-      // 2. (eta < etaMax) keep tracks if dz < x and dt < y
-
-      // CASE 1 no Timing
-      if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) )
+      else
       {
         candidate->IsRecoPU = 0;
         if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
       }
-      else{
-        candidate->IsRecoPU = 1; // tracks that are rejected
-      }
-      // CASE 2 Timing up to Eta 3
-      if(charged && ((!eta_smaller && dz_smaller) || (eta_smaller && dz_smaller && dt_smaller)) )
-    //  if(charged && ((!eta_smaller_3 && dz_smaller) || (eta_smaller_3 && dz_smaller && dt_smaller)) )
-      {
-        candidate->IsRecoPU_EtaMax3 = 0;
-        if(candidate->Momentum.Pt() > fPTMin) array->Add(candidate);
-      }
-      else{
-        candidate->IsRecoPU_EtaMax3 = 1; // tracks that are rejected
-      }
-
     }
   }
 }
