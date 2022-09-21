@@ -537,7 +537,7 @@ module TrackSmearing TrackSmearing {
   #set InputArray TrackMerger/tracks
   set OutputArray tracks
 
-  # assume 30 ps resolution for now
+  # assume 30 ps / 50 ps / 70 ps resolution for now
   set TimeResolution 30E-12
 
  }
@@ -793,7 +793,7 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
 
   # after track smearing is applied, assume fix dt cut given in 0.1 ns = 100 ps = 100 E-12 s
   set TVertexResolution { 100E-12}
-  set EtaMax { 0}
+  set EtaMax { 4}
 
  }
 
