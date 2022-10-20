@@ -1,4 +1,5 @@
 import os
+import shutil
 ## define values: etamax, resolution, QCD or VBF, count = in how many parts should the sample be split
 name = "dummy_script"
 etamax = "4"
@@ -11,10 +12,19 @@ if is_QCD:
 else:
     sample_name = "VBF"
     input = "MCFILES/VBF_HH_bbbb_10k.hepmc"
-##copy the delphes card with different seed and Nskip events TODO
-
-## loop from 1 to 10 here to create sh files
+card_0 = "cards/CMS_PhaseII/CMS_PhaseII_Snowmass_200PU_dt_0.tcl"
+## loop from 1 to 10 here
 for i in range(count):
+    ##copy the delphes card with different seed and Nskip events TODO
+    if i!=0:
+        card_i = "cards/CMS_PhaseII/CMS_PhaseII_Snowmass_200PU_dt_"+str(i)+".tcl"
+        # open both files
+        with open(card_0,'r') as firstfile, open(card_i,'w') as secondfile:
+            # read content from first file
+            for line in firstfile:
+                     # write content to second file
+                     secondfile.write(line)
+    # create sh files
     with open("config/sh_files/"+name+"_"+str(i)+".sh",'w+') as wrapper_script:
         wrapper_script.write("""
         #! /bin/bash
