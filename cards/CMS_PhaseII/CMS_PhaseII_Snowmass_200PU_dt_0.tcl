@@ -14,7 +14,8 @@
 #######################################
 
 set SkipEvents 0
-set MaxEvents 10
+set MaxEvents 1
+set RandomSeed 1
 
 set ExecutionPath {
 
@@ -538,7 +539,7 @@ module TrackSmearing TrackSmearing {
   set OutputArray tracks
 
   # assume 30 ps / 50 ps / 70 ps resolution for now
-  set TimeResolution 30E-12
+  set TimeResolution 70E-12
 
  }
 

@@ -1,11 +1,10 @@
 import os
-import shutil
 ## define values: etamax, resolution, QCD or VBF, count = in how many parts should the sample be split
 name = "dummy_script"
 etamax = "4"
-scenario = "resolution_70ps"
+scenario = "resolution_70ps_randomseed_123"
 is_QCD = True
-count = 10
+count = 2
 if is_QCD:
     sample_name = "QCD_100kpileup"
     input = "MCFILES/QCD_HT100toInf_pythia8_events.hepmc"
@@ -15,15 +14,20 @@ else:
 card_0 = "cards/CMS_PhaseII/CMS_PhaseII_Snowmass_200PU_dt_0.tcl"
 ## loop from 1 to 10 here
 for i in range(count):
-    ##copy the delphes card with different seed and Nskip events TODO
+    ##copy the delphes card with different seed and Nskip events
     if i!=0:
         card_i = "cards/CMS_PhaseII/CMS_PhaseII_Snowmass_200PU_dt_"+str(i)+".tcl"
         # open both files
         with open(card_0,'r') as firstfile, open(card_i,'w') as secondfile:
             # read content from first file
             for line in firstfile:
-                     # write content to second file
-                     secondfile.write(line)
+                if "set SkipEvents 0" in line:
+                    secondfile.write("set SkipEvents "+str(i)+"000 \n")
+                elif "set RandomSeed 1" in line:
+                    secondfile.write("set RandomSeed "+str(i*10) +"\n")
+                # write content to second file
+                else:
+                    secondfile.write(line)
     # create sh files
     with open("config/sh_files/"+name+"_"+str(i)+".sh",'w+') as wrapper_script:
         wrapper_script.write("""
@@ -47,5 +51,5 @@ with open("config/sub_files/"+name+".submit",'w+') as htc_config:
     queue """+str(count)+"""
     """)
 ## submit everything to condor
-string="condor_submit "+name+".submit"
+string="condor_submit config/sub_files/"+name+".submit"
 print(string)
