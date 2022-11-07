@@ -46,6 +46,8 @@ public:
 private:
 
   DelphesFormula *fResolutionFormula;
+  DelphesFormula *fResolutionFormulaForward;
+
   Int_t fVertexTimeMode;
 
   TIterator *fItTrackInputArray; //!

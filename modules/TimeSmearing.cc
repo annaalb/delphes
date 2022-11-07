@@ -51,9 +51,11 @@ using namespace std;
 //------------------------------------------------------------------------------
 
 TimeSmearing::TimeSmearing() :
-  fItTrackInputArray(0), fResolutionFormula(0)
+  fItTrackInputArray(0), fResolutionFormula(0), fResolutionFormulaForward(0)
 {
 	fResolutionFormula = new DelphesFormula;
+  fResolutionFormulaForward = new DelphesFormula;
+
 }
 
 //------------------------------------------------------------------------------
@@ -61,6 +63,7 @@ TimeSmearing::TimeSmearing() :
 TimeSmearing::~TimeSmearing()
 {
 	if(fResolutionFormula) delete fResolutionFormula;
+  if(fResolutionFormulaForward) delete fResolutionFormulaForward;
 }
 
 //------------------------------------------------------------------------------
@@ -71,6 +74,7 @@ void TimeSmearing::Init()
 
   // read time resolution formula in seconds
   fResolutionFormula->Compile(GetString("TimeResolution", "30e-12"));
+  fResolutionFormulaForward->Compile(GetString("TimeResolutionForward", "30e-12"));
 
   // import track input array
   //fTrackInputArray = ImportArray(GetString("TrackInputArray", "MuonMomentumSmearing/muons"));
@@ -115,10 +119,17 @@ void TimeSmearing::Process()
     eta = candidateMomentum.Eta();
     energy = candidateMomentum.E();
 
-    // apply smearing formula
-    timeResolution = fResolutionFormula->Eval(0.0, eta, 0.0, energy);
-    tf_smeared = gRandom->Gaus(tf, timeResolution);
-    ti_smeared = gRandom->Gaus(ti, timeResolution);
+    // apply smearing formula NEW: different resolution for forward region
+    if(eta < 4 && eta >3){
+      timeResolution = fResolutionFormulaForward->Eval(0.0, eta, 0.0, energy);
+      tf_smeared = gRandom->Gaus(tf, timeResolution);
+      ti_smeared = gRandom->Gaus(ti, timeResolution);
+    }
+    else{
+      timeResolution = fResolutionFormula->Eval(0.0, eta, 0.0, energy);
+      tf_smeared = gRandom->Gaus(tf, timeResolution);
+      ti_smeared = gRandom->Gaus(ti, timeResolution);
+    }
 
     mother = candidate;
     candidate = static_cast<Candidate *>(candidate->Clone());
