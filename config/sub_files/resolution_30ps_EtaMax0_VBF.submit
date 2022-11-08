@@ -1,0 +1,10 @@
+
+            notify_user       = anna.albrecht@desy.de
+            executable = /afs/cern.ch/user/a/aalbrech/Delphes/config/sh_files/submit_card_VBF.sh
+            output = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId)_$(ProcId).out
+            error = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId)_$(ProcId).err
+            log = /afs/cern.ch/user/a/aalbrech/Delphes/config/log/QCD/submit_card_$(ClusterId).log
+            +JobFlavour = "microcentury"
+            arguments         = $(ProcId) EtaMax0 resolution_30ps
+            queue 2
+            
